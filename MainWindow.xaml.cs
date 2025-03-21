@@ -21,6 +21,7 @@ namespace FileConver
         public MainWindow()
         {
             InitializeComponent();
+            AppDevice.flag.isInitHistoryList = Flag.ON;
         }
         private static APPDevice_Class AppDevice = new APPDevice_Class();
         public enum PageSelect_t
@@ -28,6 +29,7 @@ namespace FileConver
             FRONT_PAGE, // 首页
             HISTORY_PAGE,// 历史记录页面
             SETUP_PAGE, // 设置页面
+            UART_PAGE, // 串口页面
 
         };
 
@@ -36,21 +38,26 @@ namespace FileConver
             switch (page)
             {
                 case PageSelect_t.FRONT_PAGE:
-                    PageButton_area.Visibility = Visibility.Visible;
-                    Text_box.Visibility = Visibility.Visible;
+                    FrontePage_Grid.Visibility = Visibility.Visible; // 首页显示
+                    HistoryFile_Grid.Visibility = Visibility.Collapsed;
                     /* 在此处关闭其它页面 */
                     break;
                 case PageSelect_t.HISTORY_PAGE:
-                    PageButton_area.Visibility = Visibility.Collapsed;
-                    Text_box.Visibility = Visibility.Collapsed;
+                    HistoryFile_Grid.Visibility = Visibility.Visible;
+                    FrontePage_Grid.Visibility = Visibility.Collapsed;
                     break;
                 case PageSelect_t.SETUP_PAGE:
-                    PageButton_area.Visibility = Visibility.Collapsed;
-                    Text_box.Visibility = Visibility.Collapsed;
+                    HistoryFile_Grid.Visibility = Visibility.Collapsed;
+                    FrontePage_Grid.Visibility = Visibility.Collapsed;
                     break;
+                case PageSelect_t.UART_PAGE:
+                    HistoryFile_Grid.Visibility = Visibility.Collapsed;
+                    FrontePage_Grid.Visibility = Visibility.Collapsed;
+
+                    break;   
                 default:
-                    PageButton_area.Visibility = Visibility.Collapsed;
-                    Text_box.Visibility = Visibility.Collapsed;
+                    HistoryFile_Grid.Visibility = Visibility.Collapsed;
+                    FrontePage_Grid.Visibility = Visibility.Collapsed;
                     break;
             }
         }
@@ -70,6 +77,11 @@ namespace FileConver
         {
             PageSel = PageSelect_t.HISTORY_PAGE;
             PageManage(PageSel);
+            if(AppDevice.flag.isInitHistoryList == Flag.ON)
+            {
+                AppDevice.flag.isInitHistoryList = Flag.OFF;
+
+            }
         }
 
         private void Setup_button(object sender, RoutedEventArgs e)
@@ -85,7 +97,7 @@ namespace FileConver
          */
         private void StartConvert_butt(object sender, RoutedEventArgs e)
         {
-            if (AppDevice.FileAlreadyUpload == false) return;
+            //if (AppDevice.FileAlreadyUpload == false) return;
             if (GenerateCFile_area.IsChecked == false)
             {
                 MainOutput.Text = AppDevice.GenerCArray(false);
@@ -106,5 +118,27 @@ namespace FileConver
                 AppDevice.Upload_File();
             }
         }
+
+        private void UartSend_butt(object sender, RoutedEventArgs e)
+        {
+            PageSel = PageSelect_t.UART_PAGE;
+            PageManage(PageSel);
+        }
+
+        private void ClearHistory_butt(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void HistoryFile_DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+        private void ShowConversionHistory(object sender, RoutedEventArgs e)
+        {
+            // TODO: 这里可以添加显示转换历史的逻辑
+            MessageBox.Show("显示转换历史");
+        }
+
     }
 }

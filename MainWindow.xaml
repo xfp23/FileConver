@@ -1,8 +1,8 @@
 ﻿<Window x:Class="FileConver.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="文件转换助手" Height="450" Width="800">
-
+        Title="文件转换助手" Height="450" Width="800"
+        Icon="D:\C#\project\FileConver\icon\favicon.ico">
     <!-- 根 Grid 作为主布局 -->
     <Grid>
         <!-- 定义两列 -->
@@ -19,10 +19,11 @@
             <Button Content="首页" Background="White" Foreground="Black" Margin="5" Click="FrontePage_butt"/>
             <Button Content="历史记录" Background="White" Foreground="Black" Margin="5" Click="HistoryRecord_butt"/>
             <Button Content="设置" Background="White" Foreground="Black" Margin="5" Click="Setup_button"/>
+            <Button Content="串口发送" Background="White" Foreground="Black" Margin="5" Click="UartSend_butt"/>
         </StackPanel>
 
         <!--右侧主界面 -->
-        <Grid Grid.Column="1" Margin="10">
+        <Grid Grid.Column="1" Margin="10" x:Name="FrontePage_Grid" Visibility="Visible">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
@@ -42,5 +43,48 @@
                          VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
             </Grid>
         </Grid>
+        <Grid x:Name="HistoryFile_Grid" Grid.Column="1" Margin="10" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- 清空历史按钮 -->
+            <Button Click="ClearHistory_butt" Height="25" Grid.Row="0" HorizontalAlignment="Right"
+            Content="清空历史" Background="White" Foreground="Black" Margin="5"/>
+
+            <!-- DataGrid 作为历史记录表格 -->
+            <DataGrid x:Name="HistoryFile_DataGrid" Grid.Row="1" Margin="5" AutoGenerateColumns="False"
+              HeadersVisibility="Column" CanUserAddRows="False" CanUserDeleteRows="False"
+              IsReadOnly="True" SelectionChanged="HistoryFile_DataGrid_SelectionChanged">
+                <DataGrid.Columns>
+                    <!-- 文件名 -->
+                    <DataGridTextColumn Header="文件名" Binding="{Binding FileName}" Width="*" />
+
+                    <!-- 文件路径 -->
+                    <DataGridTextColumn Header="文件路径" Binding="{Binding FilePath}" Width="2*" />
+
+                    <!-- 详情按钮 -->
+                    <DataGridTemplateColumn Header="转换历史" Width="Auto">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="..." Width="30" Height="20" Click="ShowConversionHistory"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- 生成状态（不可更改复选框） -->
+                    <DataGridTemplateColumn Header="已生成" Width="Auto">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding GenerateCFile}" IsEnabled="False"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+
     </Grid>
 </Window>
