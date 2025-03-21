@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="文件转换助手" Height="450" Width="800">
 
-    <!-- 🌟 根 Grid 作为主布局 -->
+    <!-- 根 Grid 作为主布局 -->
     <Grid>
         <!-- 定义两列 -->
         <Grid.ColumnDefinitions>
@@ -13,7 +13,7 @@
             <!-- 右侧内容区，宽度自适应窗口变化 -->
         </Grid.ColumnDefinitions>
 
-        <!-- 🌟 侧边栏 -->
+        <!-- 侧边栏 -->
         <StackPanel Grid.Column="0" Background="#80000000" VerticalAlignment="Stretch" >
             <Label Content="导航栏" Foreground="White" FontSize="24" HorizontalAlignment="Center" Margin="0,20,0,20"/>
             <Button Content="首页" Background="White" Foreground="Black" Margin="5" Click="FrontePage_butt"/>
