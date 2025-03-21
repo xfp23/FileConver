@@ -1,7 +1,7 @@
 ﻿<Window x:Class="FileConver.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="450" Width="800">
+        Title="文件转换助手" Height="450" Width="800">
 
     <!-- 🌟 根 Grid 作为主布局 -->
     <Grid>
@@ -14,37 +14,33 @@
         </Grid.ColumnDefinitions>
 
         <!-- 🌟 侧边栏 -->
-        <StackPanel Grid.Column="0" Background="#80000000" VerticalAlignment="Stretch">
+        <StackPanel Grid.Column="0" Background="#80000000" VerticalAlignment="Stretch" >
             <Label Content="导航栏" Foreground="White" FontSize="24" HorizontalAlignment="Center" Margin="0,20,0,20"/>
-            <Button Content="首页" Background="White" Foreground="Black" Margin="5"/>
-            <Button Content="历史记录" Background="White" Foreground="Black" Margin="5"/>
-            <Button Content="设置" Background="White" Foreground="Black" Margin="5"/>
+            <Button Content="首页" Background="White" Foreground="Black" Margin="5" Click="FrontePage_butt"/>
+            <Button Content="历史记录" Background="White" Foreground="Black" Margin="5" Click="HistoryRecord_butt"/>
+            <Button Content="设置" Background="White" Foreground="Black" Margin="5" Click="Setup_button"/>
         </StackPanel>
 
-        <!-- 🌟 右侧主界面 -->
+        <!--右侧主界面 -->
         <Grid Grid.Column="1" Margin="10">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
-                <!-- 右侧界面占满全部空间 -->
             </Grid.RowDefinitions>
 
-            <!-- ✅ 页面容器（用于切换页面） -->
-            <StackPanel x:Name="PageContainer" Grid.Row="0" Visibility="Visible">
-                <!-- ✅ 生成 .c 文件 复选框 -->
-                <CheckBox Content="生成.c文件" Foreground="Black" Margin="5"/>
-
-                <!-- ✅ 按钮区域 -->
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="5">
-                    <Button Content="上传文件" Width="100" Height="30" Background="White" Foreground="Black" Margin="5"/>
-                    <Button Content="开始转换" Width="100" Height="30" Background="White" Foreground="Black" Margin="5"/>
-                </StackPanel>
-
-                <TextBox Margin="5" VerticalScrollBarVisibility="Auto"
-         AcceptsReturn="True" TextWrapping="Wrap"
-         Height="Auto"/>
-                <!-- 高度自动调整 -->
-
+            <!--按钮区域 -->
+            <StackPanel x:Name="PageButton_area" Orientation="Horizontal" HorizontalAlignment="Left" Margin="5" Grid.Row="0" Visibility="Visible">
+                <CheckBox x:Name="GenerateCFile_area" Content="生成.c文件" Foreground="Black" Margin="5"/>
+                <Button Content="上传文件" Width="100" Height="30" Background="White" Foreground="Black" Margin="5" Click="Upload_butt"/>
+                <Button Content="开始转换" Width="100" Height="30" Background="White" Foreground="Black" Margin="5" Click="StartConvert_butt"/>
             </StackPanel>
+
+            <!--文本框填充剩余空间 -->
+            <Grid Grid.Row="1" x:Name="Text_box"> <!--指定控件放在哪一行 -->
+                <TextBox x:Name="MainOutput" Margin="5" VerticalScrollBarVisibility="Auto"
+                         AcceptsReturn="True" TextWrapping="Wrap"
+                         VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+            </Grid>
         </Grid>
     </Grid>
 </Window>
