@@ -23,14 +23,14 @@
         </StackPanel>
 
         <!--右侧主界面 -->
-        <Grid Grid.Column="1" Margin="10" x:Name="FrontePage_Grid" Visibility="Visible">
+        <Grid Grid.Column="1" Margin="10" x:Name="FrontePage_Grid" Visibility="Collapsed">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
             <!--按钮区域 -->
-            <StackPanel x:Name="PageButton_area" Orientation="Horizontal" HorizontalAlignment="Left" Margin="5" Grid.Row="0" Visibility="Visible">
+            <StackPanel x:Name="PageButton_area" Orientation="Horizontal" HorizontalAlignment="Left" Margin="5" Grid.Row="0">
                 <CheckBox x:Name="GenerateCFile_area" Content="生成.c文件" Foreground="Black" Margin="5"/>
                 <Button Content="上传文件" Width="100" Height="30" Background="White" Foreground="Black" Margin="5" Click="Upload_butt"/>
                 <Button Content="开始转换" Width="100" Height="30" Background="White" Foreground="Black" Margin="5" Click="StartConvert_butt"/>
@@ -84,6 +84,128 @@
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
+        <!-- 设置界面 -->
+        <!-- 设置界面 -->
+        <Grid Grid.Column="1" Visibility="Collapsed" x:Name="SettingsPanel_Grid">
+            <!-- 滚动容器 -->
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+
+                <!-- 设置界面 -->
+                <Grid  Margin="10" Width="Auto" Height="Auto">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <!-- 标题 -->
+                        <RowDefinition Height="*"/>
+                        <!-- 主内容 -->
+                    </Grid.RowDefinitions>
+
+                    <!-- 标题 -->
+                    <TextBlock Text="⚙ 设置" FontSize="24" FontWeight="Bold" Margin="10" Foreground="Black"/>
+
+                    <!-- 主内容区 -->
+                    <StackPanel Grid.Row="1" Margin="10">
+
+                        <!-- 主题设置 -->
+                        <GroupBox Header="外观设置" Margin="5">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="选择主题：" VerticalAlignment="Center" Margin="5"/>
+                                <ComboBox x:Name="ThemeSelector" Width="150" Margin="5">
+                                    <ComboBoxItem Content="🌞 浅色模式" IsSelected="False"/>
+                                    <ComboBoxItem Content="🌙 深色模式"/>
+                                    <ComboBoxItem Content="🔄跟随系统" IsSelected="True"/>
+                                </ComboBox>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <!-- 文件路径设置 -->
+                        <GroupBox Header="文件存储路径" Margin="5">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="5">
+                                    <TextBlock Text="保存路径：" VerticalAlignment="Center"/>
+                                    <TextBox x:Name="SaveFilePath" Width="300" Margin="5" IsReadOnly="True" Text='/default'/>
+                                    <Button Content="📁 选择" Width="80" Click="SelectSavePath_Click"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <!-- 日志路径设置 -->
+                        <GroupBox Header="日志存储路径" Margin="5">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="5">
+                                    <TextBlock Text="日志路径：" VerticalAlignment="Center" />
+                                    <TextBox x:Name="LogFilePath" Width="300" Margin="5" IsReadOnly="True" Text='/default'/>
+                                    <Button Content="📁 选择" Width="80" Click="SelectLogPath_Click"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <!-- 历史记录设置 -->
+                        <GroupBox Header="历史记录" Margin="5">
+                            <StackPanel>
+                                <TextBlock Text="历史记录存储数量：" Margin="5"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <Slider x:Name="HistorySizeSlider" Minimum="10" Maximum="100" Value="20" TickFrequency="10"
+                                    IsSnapToTickEnabled="True" Width="200" Margin="5"/>
+                                    <TextBlock x:Name="HistorySizeValue" Text="20" VerticalAlignment="Center" FontWeight="Bold"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <!-- 文件转换设置 -->
+                        <GroupBox Header="文件转换" Margin="5">
+                            <StackPanel>
+                                <CheckBox x:Name="AutoGenerateCFile" Content="✅ 自动生成 .c 文件" Margin="5"/>
+                                <CheckBox x:Name="EnableLogging" Content="📝 启用日志记录" Margin="5"/>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <!-- 数据格式 & 是否保留文件头 -->
+                        <GroupBox Header="文件格式  选项" Margin="5">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1.2*"/>
+                                    <ColumnDefinition Width="0.8*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- 选择数据格式 -->
+                                <StackPanel Margin="5">
+                                    <TextBlock Text="数据格式：" Margin="5"/>
+                                    <ComboBox x:Name="DataFormate_ComboBox" Height="30" Width="150">
+                                        <ComboBoxItem Content="📁 全部" IsSelected="True"/>
+                                        <ComboBoxItem Content="🖼 PNG"/>
+                                        <ComboBoxItem Content="📷 JPG"/>
+                                        <ComboBoxItem Content="🎵 WAV"/>
+                                        <ComboBoxItem Content="🎶 MP3"/>
+                                        <ComboBoxItem Content="🔢 HEX"/>
+                                        <ComboBoxItem Content="💾 BIN"/>
+                                    </ComboBox>
+                                </StackPanel>
+
+                                <!-- 选择是否保留文件头 -->
+                                <StackPanel Margin="5" Grid.Column="1">
+                                    <TextBlock Text="保留文件头：" Margin="5"/>
+                                    <ComboBox x:Name="SaveFileHeader_ComboBox" Height="30" Width="120">
+                                        <ComboBoxItem Content="✅ 是" IsSelected="True"/>
+                                        <ComboBoxItem Content="❌ 否"/>
+                                    </ComboBox>
+                                </StackPanel>
+                            </Grid>
+                        </GroupBox>
+
+                        <!-- 保存按钮 -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+                            <Button Content="💾 保存设置" Width="120" Height="40" Background="#0078D7" Foreground="White" FontWeight="Bold"
+                            Margin="5" Click="SaveSettings_Click"/>
+                            <Button Content="🔄 取消" Width="100" Height="40" Background="#D9534F" Foreground="White" FontWeight="Bold"
+                            Margin="5"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </ScrollViewer>
+        </Grid>
+
+
 
 
     </Grid>

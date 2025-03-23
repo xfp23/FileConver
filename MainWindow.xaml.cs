@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -9,136 +10,170 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using static APPDevice_Class;
+using System.Threading;
+using UserTim;
 
 namespace FileConver
 {
+public enum PageSelect_t
+{
+    FRONT_PAGE, // 首页
+    HISTORY_PAGE, // 历史记录页面
+    SETUP_PAGE, // 设置页面
+    UART_PAGE, // 串口页面
+}
+public partial class MainWindow : Window
+{
+    private APPDevice_Class AppDevice;
+    private static PageSelect_t PageSel = PageSelect_t.FRONT_PAGE;
+    private UserTim_Class userTimer;
 
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    private Thread workerThread; // 工作线程
+    private bool isRunning = true;
+
+
+
+    public MainWindow()
     {
-        public MainWindow()
-        {
-            InitializeComponent();
-            AppDevice.flag.isInitHistoryList = Flag.ON;
-        }
-        private static APPDevice_Class AppDevice = new APPDevice_Class();
-        public enum PageSelect_t
-        {
-            FRONT_PAGE, // 首页
-            HISTORY_PAGE,// 历史记录页面
-            SETUP_PAGE, // 设置页面
-            UART_PAGE, // 串口页面
+        InitializeComponent();
+        AppDevice = new APPDevice_Class(this);
+        AppDevice.flag.isInitHistoryList = Flag.ON;
+        userTimer = new UserTim_Class(); // 创建一个用户定时器
+                                            // 在构造函数中初始化 DeviceMain_Loop
+                                            // 启动独立线程
+        workerThread = new Thread(Taskloop);
+        workerThread.IsBackground = true; // 设置为后台线程
+        workerThread.Start();
+    }
 
-        };
+    // while(1)
+    private void Taskloop()
+    {
+        Debug.WriteLine($"Taskloop 被调用, UserTimer={true}");
 
-        private void PageManage(PageSelect_t page)
+        while (isRunning)
         {
-            switch (page)
+            if (userTimer.UserTimFlag.system1ms_Flag)
             {
-                case PageSelect_t.FRONT_PAGE:
-                    FrontePage_Grid.Visibility = Visibility.Visible; // 首页显示
-                    HistoryFile_Grid.Visibility = Visibility.Collapsed;
-                    /* 在此处关闭其它页面 */
-                    break;
-                case PageSelect_t.HISTORY_PAGE:
-                    HistoryFile_Grid.Visibility = Visibility.Visible;
-                    FrontePage_Grid.Visibility = Visibility.Collapsed;
-                    break;
-                case PageSelect_t.SETUP_PAGE:
-                    HistoryFile_Grid.Visibility = Visibility.Collapsed;
-                    FrontePage_Grid.Visibility = Visibility.Collapsed;
-                    break;
-                case PageSelect_t.UART_PAGE:
-                    HistoryFile_Grid.Visibility = Visibility.Collapsed;
-                    FrontePage_Grid.Visibility = Visibility.Collapsed;
-
-                    break;   
-                default:
-                    HistoryFile_Grid.Visibility = Visibility.Collapsed;
-                    FrontePage_Grid.Visibility = Visibility.Collapsed;
-                    break;
-            }
-        }
-        private static PageSelect_t PageSel = PageSelect_t.FRONT_PAGE;
-
-        /**
-         * @brief 首页按钮
-         * 
-         */
-        private void FrontePage_butt(object sender, RoutedEventArgs e)
-        {
-            PageSel = PageSelect_t.FRONT_PAGE;
-            PageManage(PageSel);
-        }
-
-        private void HistoryRecord_butt(object sender, RoutedEventArgs e)
-        {
-            PageSel = PageSelect_t.HISTORY_PAGE;
-            PageManage(PageSel);
-            if(AppDevice.flag.isInitHistoryList == Flag.ON)
-            {
-                AppDevice.flag.isInitHistoryList = Flag.OFF;
+                Console.WriteLine("[线程] 处理 1ms 任务...");
+                userTimer.UserTimFlag.system1ms_Flag = false;
 
             }
-        }
 
-        private void Setup_button(object sender, RoutedEventArgs e)
-        {
-            PageSel = PageSelect_t.SETUP_PAGE;
-            PageManage(PageSel);
-        }
-
-        /**
-         * 此处开始转换
-         * 
-         * 
-         */
-        private void StartConvert_butt(object sender, RoutedEventArgs e)
-        {
-            //if (AppDevice.FileAlreadyUpload == false) return;
-            if (GenerateCFile_area.IsChecked == false)
+            if (userTimer.UserTimFlag.system10ms_Flag)
             {
-                MainOutput.Text = AppDevice.GenerCArray(false);
-                return;
+                Console.WriteLine("[线程] 处理 10ms 任务...");
+                userTimer.UserTimFlag.system10ms_Flag = false;
+                // **在 UI 线程上调用 PageManage**
+                if (Application.Current != null && Application.Current.Dispatcher != null)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        PageManage(PageSel);
+                    });
+                }
+
             }
-            MainOutput.Text = AppDevice.GenerCArray(true);
 
-
-        }
-        /**
-         * 此处上传文件
-         * 
-         */
-        private void Upload_butt(object sender, RoutedEventArgs e)
-        {
-            if(PageSel == PageSelect_t.FRONT_PAGE)
+            if (userTimer.UserTimFlag.system100ms_Flag)
             {
-                AppDevice.Upload_File();
+                Console.WriteLine("[线程] 处理 100ms 任务...");
+                userTimer.UserTimFlag.system100ms_Flag = false;
+                AppDevice.DealWith_Front(); // 处理首页
             }
-        }
 
-        private void UartSend_butt(object sender, RoutedEventArgs e)
+            if (userTimer.UserTimFlag.system500ms_Flag)
+            {
+                Console.WriteLine("[线程] 处理 500ms 任务...");
+                userTimer.UserTimFlag.system500ms_Flag = false;
+            }
+
+            if (userTimer.UserTimFlag.system1000ms_Flag)
+            {
+                Console.WriteLine("[线程] 处理 1000ms 任务...");
+                userTimer.UserTimFlag.system1000ms_Flag = false;
+            }
+
+            // 避免 CPU 过载
+            Thread.Sleep(1);
+        }
+    }
+
+
+    /**
+    * 管理页面
+*/
+    private void PageManage(PageSelect_t page)
+    {
+        FrontePage_Grid.Visibility = (page == PageSelect_t.FRONT_PAGE) ? Visibility.Visible : Visibility.Collapsed;
+        HistoryFile_Grid.Visibility = (page == PageSelect_t.HISTORY_PAGE) ? Visibility.Visible : Visibility.Collapsed;
+        SettingsPanel_Grid.Visibility = (page == PageSelect_t.SETUP_PAGE) ? Visibility.Visible : Visibility.Collapsed;
+    }
+    // 处理导航栏按钮
+    private void FrontePage_butt(object sender, RoutedEventArgs e)
+    {
+        PageSel = PageSelect_t.FRONT_PAGE;
+    }
+
+    private void HistoryRecord_butt(object sender, RoutedEventArgs e)
+    {
+        PageSel = PageSelect_t.HISTORY_PAGE;
+        if (AppDevice.flag.isInitHistoryList == Flag.ON)
         {
-            PageSel = PageSelect_t.UART_PAGE;
-            PageManage(PageSel);
+            AppDevice.flag.isInitHistoryList = Flag.OFF;
         }
+    }
 
-        private void ClearHistory_butt(object sender, RoutedEventArgs e)
+    private void Setup_button(object sender, RoutedEventArgs e)
+    {
+        PageSel = PageSelect_t.SETUP_PAGE;
+    }
+
+    // 转换功能
+    private void StartConvert_butt(object sender, RoutedEventArgs e)
+    {
+        AppDevice.flag.isStartConvertButt = Flag.ON;
+        if (GenerateCFile_area.IsChecked == false)
         {
-
+            AppDevice.flag.ischkGenCFile = Flag.OFF;
+            // MainOutput.Text = AppDevice.GenerCArray(false);
+             return;
         }
+        // MainOutput.Text = AppDevice.GenerCArray(true);
+        AppDevice.flag.ischkGenCFile = Flag.ON;
 
-        private void HistoryFile_DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
-        private void ShowConversionHistory(object sender, RoutedEventArgs e)
-        {
-            // TODO: 这里可以添加显示转换历史的逻辑
-            MessageBox.Show("显示转换历史");
-        }
 
     }
+
+    // 上传文件
+    private void Upload_butt(object sender, RoutedEventArgs e)
+    {
+        if (PageSel == PageSelect_t.FRONT_PAGE)
+        {
+            AppDevice.Upload_File();
+        }
+    }
+
+    // 串口发送
+    private void UartSend_butt(object sender, RoutedEventArgs e)
+    {
+        PageSel = PageSelect_t.UART_PAGE;
+        // PageManage(PageSel);
+    }
+
+    // 清除历史
+    private void ClearHistory_butt(object sender, RoutedEventArgs e) { }
+
+    private void ShowConversionHistory(object sender, RoutedEventArgs e)
+    {
+        MessageBox.Show("显示转换历史");
+    }
+
+    private void SaveSettings_Click(object sender, RoutedEventArgs e) { }
+    private void SelectSavePath_Click(object sender, RoutedEventArgs e) { }
+    private void SelectLogPath_Click(object sender, RoutedEventArgs e) { }
+
+    private void HistoryFile_DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e) { }
+
+}
 }
