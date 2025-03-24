@@ -18,23 +18,24 @@ using UserTim;
 using System.Collections.ObjectModel;
 using System.Windows.Automation;
 using System.ComponentModel;
+using HistoryContent;
 
 
 
 public class RelayCommand : ICommand
 {
-    private readonly Action _execute;
-    private readonly Func<bool> _canExecute;
+    private readonly Action<object> _execute;
+    private readonly Func<object, bool> _canExecute;
 
-    public RelayCommand(Action execute, Func<bool> canExecute = null)
+    public RelayCommand(Action<object> execute, Func<object, bool> canExecute = null)
     {
         _execute = execute ?? throw new ArgumentNullException(nameof(execute));
         _canExecute = canExecute;
     }
 
-    public bool CanExecute(object parameter) => _canExecute == null || _canExecute();
-    
-    public void Execute(object parameter) => _execute();
+    public bool CanExecute(object parameter) => _canExecute == null || _canExecute(parameter);
+
+    public void Execute(object parameter) => _execute(parameter);
 
     public event EventHandler CanExecuteChanged
     {
@@ -43,73 +44,32 @@ public class RelayCommand : ICommand
     }
 }
 
-
-public class HistoryFile : INotifyPropertyChanged
+public class HistoryFile
 {
-    private string _fileName;
-    private string _filePath;
-    private bool _generateCFile;
-    private string _cArrary_conten;
-
-    public string FileName
-    {
-        get => _fileName;
-        set
-        {
-            _fileName = value;
-            OnPropertyChanged(nameof(FileName));
-        }
-    }
-
-    public string FilePath
-    {
-        get => _filePath;
-        set
-        {
-            _filePath = value;
-            OnPropertyChanged(nameof(FilePath));
-        }
-    }
-
-    public bool IsGenerated
-    {
-        get => _generateCFile;
-        set
-        {
-            _generateCFile = value;
-            OnPropertyChanged(nameof(IsGenerated));
-        }
-    }
-
-    public string CArrary_conten
-    {
-        get => _cArrary_conten;
-        set
-        {
-            _cArrary_conten = value;
-            OnPropertyChanged(nameof(CArrary_conten));
-        }
-    }
-
-    public ICommand ShowDetailsCommand { get; }
-
-    public event PropertyChangedEventHandler PropertyChanged;
+    public string CArrary_conten { get; set; }
+    public string FileName { get; set; }
+    public string FilePath { get; set; }
+    public bool IsGenerated { get; set; }
+    public ICommand ShowDetailsCommand { get; set; }
 
     public HistoryFile()
     {
-        ShowDetailsCommand = new RelayCommand(ShowDetails);
+        ShowDetailsCommand = new RelayCommand(param => ShowDetails());
     }
 
     private void ShowDetails()
     {
-        MessageBox.Show(CArrary_conten, "转换结果");
+        string details = $"{FileName}: {CArrary_conten}";
+
+        // 创建并显示自定义窗口
+        var detailsWindow = new FileDetailsWindow();
+        detailsWindow.ContentTextBox.Text = details;  // 将内容传递给窗口
+        detailsWindow.ShowDialog();
     }
 
-    protected void OnPropertyChanged(string propertyName)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
+
 }
+
 
 public class APPDevice_Class // 设备类
 {
@@ -204,14 +164,18 @@ public class APPDevice_Class // 设备类
                     this.flag.isHistoryFileFull = Flag.ON; // 文件已满
                 }
                 this.flag.isHistoryFileNew = Flag.ON; // 有新的历史文件记录被更新
+            mainWindow.Dispatcher.Invoke(() =>
+            {
                 historyFile.Add(new HistoryFile
                 {
                     FileName = FileName,
                     CArrary_conten = cArrayContent,
                     FilePath = Filepath,
-                    IsGenerated  = CFile
-                }); // 添加
-                this.historyIndex++;
+                    IsGenerated = CFile
+                });
+            });
+
+            this.historyIndex++;
             
             FileName_buff = FileName;
             FilePath_buff = Filepath;

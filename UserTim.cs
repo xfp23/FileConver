@@ -23,8 +23,6 @@ namespace UserTim
 
         public UserTimFlag_t UserTimFlag;
         private System.Timers.Timer timer;
-        private Thread workerThread;
-        private bool isRunning = true;
 
         // 构造函数
         public UserTim_Class()

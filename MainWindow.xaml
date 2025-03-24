@@ -54,31 +54,51 @@
             </Border>
         </Grid>
 
+        <Grid x:Name="HistoryFile_Grid" Grid.Column="1">
+            <!-- 定义 2 行 -->
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- 第一行：按钮 -->
+                <RowDefinition Height="*"/>
+                <!-- 第二行：DataGrid，占据剩余空间 -->
+            </Grid.RowDefinitions>
 
-<DataGrid x:Name="HistoryFile_DataGrid" Grid.Row="1" Margin="5" AutoGenerateColumns="False" Grid.Column="1"
-    HeadersVisibility="Column" CanUserAddRows="False" CanUserDeleteRows="False"
-    IsReadOnly="True" SelectionChanged="HistoryFile_DataGrid_SelectionChanged">
-    <DataGrid.Columns>
-        <!-- 文件路径 -->
-        <DataGridTextColumn Header="文件路径" Binding="{Binding FilePath}" Width="*" />
+            <!-- 清除历史记录按钮（放在第一行，靠右） -->
+            <Button Content="清除历史" HorizontalAlignment="Right" VerticalAlignment="Top"
+        Margin="5,5,5,5" Background="Red" Foreground="White" 
+        Click="ClearHistory_butt" Height="30" Width="80" Grid.Row="0"/>
 
-        <!-- 文件名 -->
-        <DataGridTextColumn Header="文件名" Binding="{Binding FileName}" Width="*" />
+          
+            <DataGrid x:Name="HistoryFile_DataGrid" Margin="5" AutoGenerateColumns="False"
+        HeadersVisibility="Column" CanUserAddRows="False" CanUserDeleteRows="False"
+        IsReadOnly="True" SelectionChanged="HistoryFile_DataGrid_SelectionChanged"
+        ItemsSource="{Binding HistoryFiles}" Grid.Row="1">
 
-        <!-- 详情按钮列 -->
-        <DataGridTemplateColumn Header="转换结果" Width="Auto">
-            <DataGridTemplateColumn.CellTemplate>
-                <DataTemplate>
-                    <Button Content="..." Width="60" Height="25" 
-                        Command="{Binding ShowDetails}" />
-                </DataTemplate>
-            </DataGridTemplateColumn.CellTemplate>
-        </DataGridTemplateColumn>
+                <DataGrid.Columns>
+                    <!-- 文件路径 -->
+                    <DataGridTextColumn Header="文件路径" Binding="{Binding FilePath}" Width="*" />
 
-        <!-- 复选框列 -->
-        <DataGridCheckBoxColumn Header="是否生成.c" Binding="{Binding IsGenerated}" IsReadOnly="True" Width="Auto"/>
-    </DataGrid.Columns>
-</DataGrid>
+                    <!-- 文件名 -->
+                    <DataGridTextColumn Header="文件名" Binding="{Binding FileName}" Width="*" />
+
+                    <!-- 详情按钮列 -->
+                    <DataGridTemplateColumn Header="转换结果" Width="Auto">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="查看" Width="60" Height="25"
+                            Command="{Binding ShowDetailsCommand}" 
+                            CommandParameter="{Binding}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- 复选框列 -->
+                    <DataGridCheckBoxColumn Header="C" Binding="{Binding IsGenerated}" IsReadOnly="True" Width="Auto"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+
 
 
 

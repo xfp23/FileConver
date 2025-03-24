@@ -39,10 +39,8 @@ public partial class MainWindow : Window
         AppDevice = new APPDevice_Class(this);
         AppDevice.flag.isInitHistoryList = Flag.ON;
         userTimer = new UserTim_Class(); // 创建一个用户定时器
-                                            // 在构造函数中初始化 DeviceMain_Loop
-                                            // 启动独立线程
         workerThread = new Thread(Taskloop);
-        workerThread.IsBackground = true; // 设置为后台线程
+        workerThread.IsBackground = true; 
         workerThread.Start();
     }
 
@@ -107,7 +105,7 @@ public partial class MainWindow : Window
     private void PageManage(PageSelect_t page)
     {
         FrontePage_Grid.Visibility = (page == PageSelect_t.FRONT_PAGE) ? Visibility.Visible : Visibility.Collapsed;
-        HistoryFile_DataGrid.Visibility = (page == PageSelect_t.HISTORY_PAGE) ? Visibility.Visible : Visibility.Collapsed;
+        HistoryFile_Grid.Visibility = (page == PageSelect_t.HISTORY_PAGE) ? Visibility.Visible : Visibility.Collapsed;
         SettingsPanel_Grid.Visibility = (page == PageSelect_t.SETUP_PAGE) ? Visibility.Visible : Visibility.Collapsed;
     }
     // 处理导航栏按钮
