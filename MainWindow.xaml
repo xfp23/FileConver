@@ -22,68 +22,66 @@
             <Button Content="串口发送" Background="White" Foreground="Black" Margin="5" Click="UartSend_butt"/>
         </StackPanel>
 
-        <!--右侧主界面 -->
         <Grid Grid.Column="1" Margin="10" x:Name="FrontePage_Grid" Visibility="Collapsed">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <!-- 按钮区域 -->
                 <RowDefinition Height="*"/>
+                <!-- 文本框区域 -->
             </Grid.RowDefinitions>
 
-            <!--按钮区域 -->
-            <StackPanel x:Name="PageButton_area" Orientation="Horizontal" HorizontalAlignment="Left" Margin="5" Grid.Row="0">
-                <CheckBox x:Name="GenerateCFile_area" Content="生成.c文件" Foreground="Black" Margin="5"/>
-                <Button Content="上传文件" Width="100" Height="30" Background="White" Foreground="Black" Margin="5" Click="Upload_butt"/>
-                <Button Content="开始转换" Width="100" Height="30" Background="White" Foreground="Black" Margin="5" Click="StartConvert_butt"/>
+            <!-- 按钮区域 -->
+            <StackPanel x:Name="PageButton_area" Orientation="Horizontal"
+                HorizontalAlignment="Center" Margin="0,0,0,10" Grid.Row="0">
+                <CheckBox x:Name="GenerateCFile_area" Content="生成 .c 文件"
+                  Foreground="Black" Margin="10,0" VerticalAlignment="Center"/>
+                <Button Content="上传文件" Width="120" Height="36" Background="#0078D7"
+                Foreground="White" FontWeight="Bold" Margin="10,0"
+                Click="Upload_butt" BorderThickness="0" Cursor="Hand"/>
+                <Button Content="开始转换" Width="120" Height="36" Background="#28A745"
+                Foreground="White" FontWeight="Bold" Margin="10,0"
+                Click="StartConvert_butt" BorderThickness="0" Cursor="Hand"/>
             </StackPanel>
 
-            <!--文本框填充剩余空间 -->
-            <Grid Grid.Row="1" x:Name="Text_box"> <!--指定控件放在哪一行 -->
-                <TextBox x:Name="MainOutput" Margin="5" VerticalScrollBarVisibility="Auto"
-                         AcceptsReturn="True" TextWrapping="Wrap"
-                         VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
-            </Grid>
+            <!-- 文本框区域 -->
+            <Border Grid.Row="1" Margin="5" Padding="5" Background="White" 
+            BorderBrush="#D0D0D0" BorderThickness="1" CornerRadius="5">
+                <TextBox x:Name="MainOutput" VerticalScrollBarVisibility="Auto"
+                 AcceptsReturn="True" TextWrapping="Wrap"
+                 VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                 FontSize="14" Foreground="Black" Background="Transparent"
+                 BorderThickness="0" />
+            </Border>
         </Grid>
-        <Grid x:Name="HistoryFile_Grid" Grid.Column="1" Margin="10" Visibility="Collapsed">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
 
-            <!-- 清空历史按钮 -->
-            <Button Click="ClearHistory_butt" Height="25" Grid.Row="0" HorizontalAlignment="Right"
-            Content="清空历史" Background="White" Foreground="Black" Margin="5"/>
 
-            <!-- DataGrid 作为历史记录表格 -->
-            <DataGrid x:Name="HistoryFile_DataGrid" Grid.Row="1" Margin="5" AutoGenerateColumns="False"
-              HeadersVisibility="Column" CanUserAddRows="False" CanUserDeleteRows="False"
-              IsReadOnly="True" SelectionChanged="HistoryFile_DataGrid_SelectionChanged">
-                <DataGrid.Columns>
-                    <!-- 文件名 -->
-                    <DataGridTextColumn Header="文件名" Binding="{Binding FileName}" Width="*" />
+<DataGrid x:Name="HistoryFile_DataGrid" Grid.Row="1" Margin="5" AutoGenerateColumns="False" Grid.Column="1"
+    HeadersVisibility="Column" CanUserAddRows="False" CanUserDeleteRows="False"
+    IsReadOnly="True" SelectionChanged="HistoryFile_DataGrid_SelectionChanged">
+    <DataGrid.Columns>
+        <!-- 文件路径 -->
+        <DataGridTextColumn Header="文件路径" Binding="{Binding FilePath}" Width="*" />
 
-                    <!-- 文件路径 -->
-                    <DataGridTextColumn Header="文件路径" Binding="{Binding FilePath}" Width="2*" />
+        <!-- 文件名 -->
+        <DataGridTextColumn Header="文件名" Binding="{Binding FileName}" Width="*" />
 
-                    <!-- 详情按钮 -->
-                    <DataGridTemplateColumn Header="转换历史" Width="Auto">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button Content="..." Width="30" Height="20" Click="ShowConversionHistory"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
+        <!-- 详情按钮列 -->
+        <DataGridTemplateColumn Header="转换结果" Width="Auto">
+            <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                    <Button Content="..." Width="60" Height="25" 
+                        Command="{Binding ShowDetails}" />
+                </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
 
-                    <!-- 生成状态（不可更改复选框） -->
-                    <DataGridTemplateColumn Header="已生成" Width="Auto">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <CheckBox IsChecked="{Binding GenerateCFile}" IsEnabled="False"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                </DataGrid.Columns>
-            </DataGrid>
-        </Grid>
+        <!-- 复选框列 -->
+        <DataGridCheckBoxColumn Header="是否生成.c" Binding="{Binding IsGenerated}" IsReadOnly="True" Width="Auto"/>
+    </DataGrid.Columns>
+</DataGrid>
+
+
+
         <!-- 设置界面 -->
         <!-- 设置界面 -->
         <Grid Grid.Column="1" Visibility="Collapsed" x:Name="SettingsPanel_Grid">

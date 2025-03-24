@@ -68,11 +68,5 @@ namespace UserTim
                 UserTimFlag.system1000ms_Flag = true;
             }
         }
-
-        // **工作线程：检查标志位并执行相应任务**
-        private void ThreadLoop()
-        {
-
-        }
     }
 }

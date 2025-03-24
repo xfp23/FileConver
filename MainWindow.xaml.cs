@@ -86,6 +86,7 @@ public partial class MainWindow : Window
             {
                 Console.WriteLine("[线程] 处理 500ms 任务...");
                 userTimer.UserTimFlag.system500ms_Flag = false;
+                AppDevice.DealWith_History();
             }
 
             if (userTimer.UserTimFlag.system1000ms_Flag)
@@ -106,7 +107,7 @@ public partial class MainWindow : Window
     private void PageManage(PageSelect_t page)
     {
         FrontePage_Grid.Visibility = (page == PageSelect_t.FRONT_PAGE) ? Visibility.Visible : Visibility.Collapsed;
-        HistoryFile_Grid.Visibility = (page == PageSelect_t.HISTORY_PAGE) ? Visibility.Visible : Visibility.Collapsed;
+        HistoryFile_DataGrid.Visibility = (page == PageSelect_t.HISTORY_PAGE) ? Visibility.Visible : Visibility.Collapsed;
         SettingsPanel_Grid.Visibility = (page == PageSelect_t.SETUP_PAGE) ? Visibility.Visible : Visibility.Collapsed;
     }
     // 处理导航栏按钮
@@ -162,7 +163,11 @@ public partial class MainWindow : Window
     }
 
     // 清除历史
-    private void ClearHistory_butt(object sender, RoutedEventArgs e) { }
+    private void ClearHistory_butt(object sender, RoutedEventArgs e)
+    { 
+        AppDevice.flag.isClearHistoryButt = Flag.ON;
+
+    }
 
     private void ShowConversionHistory(object sender, RoutedEventArgs e)
     {
