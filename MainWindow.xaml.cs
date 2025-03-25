@@ -1,8 +1,9 @@
 ﻿using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using APPLogic;
+using static APPLogic.APPDevice_Class;
 using UserTim;
+using APPLogic;
 
 namespace FileConver
 {
@@ -61,21 +62,22 @@ public partial class MainWindow : Window
                         PageManage(PageSel);
                     });
                 }
+                    AppDevice.DealWith_Front(); // 处理首页
 
-            }
+                }
 
             if (userTimer.UserTimFlag.system100ms_Flag)
             {
                     Debug.WriteLine("[线程] 处理 100ms 任务...");
                 userTimer.UserTimFlag.system100ms_Flag = false;
-                AppDevice.DealWith_Front(); // 处理首页
-            }
+                    AppDevice.DealWith_History();
+                }
 
             if (userTimer.UserTimFlag.system500ms_Flag)
             {
                     Debug.WriteLine("[线程] 处理 500ms 任务...");
                 userTimer.UserTimFlag.system500ms_Flag = false;
-                AppDevice.DealWith_History();
+                    AppDevice.DealWith_SetPage(); // 处理设置页面
             }
 
             if (userTimer.UserTimFlag.system1000ms_Flag)
@@ -163,11 +165,43 @@ public partial class MainWindow : Window
         MessageBox.Show("显示转换历史");
     }
 
-    private void SaveSettings_Click(object sender, RoutedEventArgs e) { }
-    private void SelectSavePath_Click(object sender, RoutedEventArgs e) { }
-    private void SelectLogPath_Click(object sender, RoutedEventArgs e) { }
+    private void SaveSettings_Click(object sender, RoutedEventArgs e) {
+        AppDevice.flag.isGlobalSetUpdate = Flag.ON; // 全局设置更新标志位打开
+     }
 
-    private void HistoryFile_DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e) { }
+     // 选择文件保存按钮
+    private void SelectSavePath_Click(object sender, RoutedEventArgs e) {
+        AppDevice.flag.isLocalSetUpdate = Flag.ON; // 局部设置更新标志位打开
+        AppDevice.flag.isSelSavePathButt = Flag.ON; // 文件保存路径
+        AppDevice.Select_SaveFilePath();
+     }
 
-}
+     // 选择日志文件保存按钮
+    private void SelectLogPath_Click(object sender, RoutedEventArgs e) { 
+   
+        AppDevice.flag.isLocalSetUpdate = Flag.ON; // 局部设置更新标志位打开
+        AppDevice.flag.isFollowLogPath = Flag.OFF; // 日志跟随文件保存路径关闭
+        AppDevice.Select_SaveLogPath();
+    }
+
+        // 取消设置就是恢复默认设置
+    private void CancelSettings_Click(object sender, RoutedEventArgs e){
+        AppDevice.flag.isCancelSet = Flag.ON; // 取消当前设置
+    }
+    private void HistoryFile_DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e) { 
+
+    }
+
+        private void HistorySizeValue_Changed(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            double newValue = e.NewValue; // 获取滑动条的新值
+            Debug.WriteLine($"Slider 值更新: {newValue}");
+            if(HistorySizeValue != null)
+            {
+                this.HistorySizeValue.Text = newValue.ToString();
+            }
+
+        }
+
+    }
 }

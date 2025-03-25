@@ -19,9 +19,47 @@ using System.Collections.ObjectModel;
 using System.Windows.Automation;
 using System.ComponentModel;
 using HistoryContent;
+using System.Security.Cryptography;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace APPLogic{
 
+public class SettingLogic_Class  // 设置界面
+{
+    // 构造函数
+ public   SettingLogic_Class()
+    {
+        SetParam = new setParm_t();
+
+        // 默认参数设置
+        SetParam.HistorySize = 20;
+        // SetParam.FileSavePath = null;
+        // SetParam.LogSavePath = null;
+        SetParam.DataColumns = 20;
+        SetParam.DisplayMode = DisplayMode_t.AutoMode; // 跟随系统
+    }
+   public  enum DisplayMode_t {
+
+        AutoMode = 0x00, // 自动模式
+        LightMode = 0x01, // 浅色模式
+
+        DarkMode = 0x02, // 深色模式
+    }
+
+// 系统运行的参数
+    public struct setParm_t {
+        public UInt16 HistorySize; // 保留历史文件记录数
+        public UInt16 DataColumns; // 数据显示的列数
+        public string FileSavePath; // 文件保存路径
+        public string LogSavePath; // 日志保存路径
+        public DisplayMode_t DisplayMode; // 显示模式
+        public bool AutoGenerateC; // 自动生成C文件
+        public bool GenerateLog; // 生成日志
+
+    };
+
+    public setParm_t SetParam;
+}
 public class RelayCommand : ICommand
 {
     private readonly Action<object> _execute;
@@ -89,18 +127,19 @@ public class APPDevice_Class // 设备类
         public Flag isUploadFile; // 是否需要上传文件
         public Flag isHistoryFileFull; // 历史文件记录是否已满
         public Flag isClearHistoryButt; // 清除历史记录按钮是否被按下
+        public Flag isGlobalSetUpdate; // 全局设置更新
+        public Flag isLocalSetUpdate; // 局部设置更新
+        public Flag isCancelSet;       // 取消当前设置
+        public Flag isInitHistoryC; // 初始化生成c
+        public Flag isSelSavePathButt; // 选择文件保存路径按钮
+        public Flag isFollowFilePath; // 跟随文件路径
+        public Flag isFollowLogPath; // 日志自动跟随文件保存路径
 
     };
-    // public struct HistoryFile
-    // {
-    //     public string CArrary_conten; // c数组内容
-    //     public string FileName;        // 文件名
-    //     public string FilePath;       // 文件路径
-    //     public bool GenerateCFile;    // 是否生成了C文件
-    // };
 
     private MainWindow mainWindow; // 用于访问 MainWindow 的引用
     private static string Filepath = null;
+    public SettingLogic_Class setLogic;
     private static string FileName = null;
     public bool FileAlreadyUpload = false;
     public APPDevice_Flag flag = default(APPDevice_Flag);
@@ -125,8 +164,9 @@ public class APPDevice_Class // 设备类
             // 访问ui
             mainWindow.HistoryFile_DataGrid.ItemsSource = this.historyFile;
         });
-       
-
+       setLogic = new SettingLogic_Class();
+       this.flag.isFollowFilePath = Flag.ON;
+       this.flag.isFollowLogPath = Flag.ON;
     }
     /**
         *  此方法上传文件
@@ -137,17 +177,46 @@ public class APPDevice_Class // 设备类
         if (openFileDialog.ShowDialog() == true)
         {
             Filepath = openFileDialog.FileName; // 文件路径
-            FileAlreadyUpload = true;
+            //FileAlreadyUpload = true;
             this.flag.isFileAlUpload = Flag.ON;
             // MessageBox.Show($"你选择的文件: {Filepath}", "文件上传");
         }
 
     }
+
+        public void Select_SaveFilePath()
+        {
+            var dlg = new CommonOpenFileDialog
+            {
+                IsFolderPicker = true, // 选择文件夹
+                Title = "请选择保存文件的文件夹"
+            };
+
+            if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                this.setParam_buff.FileSavePath = dlg.FileName; // 选中的文件夹路径
+            }
+        }
+
+        public void Select_SaveLogPath()
+        {
+            var dlg = new CommonOpenFileDialog
+            {
+                IsFolderPicker = true, // 选择文件夹
+                Title = "请选择保存日志的文件夹"
+            };
+
+            if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                this.setParam_buff.LogSavePath = dlg.FileName; // 选中的文件夹路径
+            }
+        }
     /**
         * 将文件转换成C数组并生成C数组
         * 参数: CFile 传入true 生成c文件 反之亦然
         */
     private string FileName_buff = null, FilePath_buff = null;
+     private bool GenerateC_buff = false;
     public string GenerCArray(bool CFile)
     {
         if (string.IsNullOrWhiteSpace(Filepath)) return "null";  // 确保已经选择了文件
@@ -156,9 +225,10 @@ public class APPDevice_Class // 设备类
         FileName = System.IO.Path.GetFileNameWithoutExtension(Filepath);
         byte[] fileData = File.ReadAllBytes(Filepath);
         string cArrayContent = FileToCArray(fileData, FileName);
-        if (FileName != FileName_buff || FilePath_buff != Filepath)
+        if ((FileName != FileName_buff || FilePath_buff != Filepath || GenerateC_buff != CFile) || this.flag.isInitHistoryC ==Flag.ON)
         {
-                if (historyIndex >= historySize)
+                if(this.flag.isInitHistoryC == Flag.ON) this.flag.isInitHistoryC = Flag.OFF;
+                if (historyIndex >= this.setLogic.SetParam.HistorySize)
                 {
                     this.historyIndex = 0;
                     this.flag.isHistoryFileFull = Flag.ON; // 文件已满
@@ -181,13 +251,23 @@ public class APPDevice_Class // 设备类
             FilePath_buff = Filepath;
         }
 
+if (CFile == true)
+{
+    string directory = System.IO.Path.GetDirectoryName(Filepath);  // 获取文件所在目录
+    string outputFilePath;
 
-        if (CFile == true)
-        {
-            string directory = System.IO.Path.GetDirectoryName(Filepath);  // 获取文件所在目录
-            string outputFilePath = System.IO.Path.Combine(directory, FileName + ".c");  // 在同级目录生成 C 文件  
-            File.WriteAllText(outputFilePath, cArrayContent);  // 写入 C 文件  
-        }
+    if (this.flag.isFollowFilePath == Flag.ON)
+    {
+        outputFilePath = System.IO.Path.Combine(directory, FileName + ".c");  // 在同级目录生成 C 文件  
+    }
+    else
+    {
+        outputFilePath = System.IO.Path.Combine(setLogic.SetParam.FileSavePath, FileName + ".c"); // 在指定的路径生成 C 文件
+    }
+
+    File.WriteAllText(outputFilePath, cArrayContent); // 写入 C 文件
+}
+
 
         return cArrayContent;
     }
@@ -248,10 +328,12 @@ public class APPDevice_Class // 设备类
                 mainWindow.HistoryFile_DataGrid.ItemsSource = this.historyFile;
                 this.historyFile.Clear(); // 清空
                 this.mainWindow.HistoryFile_DataGrid.Items.Refresh();
+                historyIndex = 0; // 清空
             });
 
         }
     }
+        // 处理首页
     public void DealWith_Front()
     {
 
@@ -282,6 +364,86 @@ public class APPDevice_Class // 设备类
             });
         }
 
+    }
+
+        // 更新设置界面
+        private void UpdateSetPage_Page( SettingLogic_Class.setParm_t param)
+        {
+            this.mainWindow.Dispatcher.Invoke(() =>
+            {
+                this.mainWindow.HistorySizeValue.Text = param.HistorySize.ToString(); // 历史记录大小
+                this.mainWindow.SaveFilePath.Text = param.FileSavePath; // 文件保存路径
+                this.mainWindow.LogFilePath.Text = param.LogSavePath;   // 日志保存路径
+                //this.mainWindow.AutoGenerateCFile.IsChecked = param.AutoGenerateC; // 设置自动生成C文件
+                //this.mainWindow.EnableLogging.IsChecked = param.GenerateLog; // 设置生成日志
+            });
+        }
+
+        /**
+         * 恢复默认界面
+         */
+        private void UpdateSetPage_Page()
+        {
+            this.mainWindow.Dispatcher.Invoke(() =>
+            {
+                this.mainWindow.HistorySizeValue.Text = "20";
+                this.mainWindow.SaveFilePath.Text = "/default"; // 文件保存路径
+                this.mainWindow.LogFilePath.Text ="/default";   // 日志保存路径
+                this.mainWindow.AutoGenerateCFile.IsChecked = false; // 取消自动生成c文件勾选
+                this.mainWindow.EnableLogging.IsChecked = false; // 取消日志功能勾选
+            });
+        }
+
+    private SettingLogic_Class.setParm_t setParam_buff = default(SettingLogic_Class.setParm_t); // 设置参数缓存
+    // 处理设置页面
+    public void DealWith_SetPage()
+    {
+
+        if(this.flag.isLocalSetUpdate == Flag.ON)
+        {
+            this.flag.isLocalSetUpdate = Flag.OFF;
+
+                UpdateSetPage_Page(setParam_buff);
+        }
+        if(this.flag.isGlobalSetUpdate == Flag.ON) // 如果是全局设置
+        {
+            this.flag.isGlobalSetUpdate = Flag.OFF; // 关闭全局设置
+            setLogic.SetParam.HistorySize = setParam_buff.HistorySize; // 更新设置
+            setLogic.SetParam.FileSavePath = setParam_buff.FileSavePath;
+                setLogic.SetParam.LogSavePath = setParam_buff.LogSavePath;
+                UpdateSetPage_Page(setLogic.SetParam);
+                if (this.flag.isSelSavePathButt == Flag.ON && this.setLogic.SetParam.FileSavePath != null) 
+            {
+                // 按了按钮但是没有正确选择路径的清况
+                this.flag.isFollowFilePath = Flag.ON; // 自动开启文件跟随
+            }else {
+                this.flag.isFollowFilePath = Flag.OFF;
+                // if(this.flag.isFollowFilePath == Flag.ON)
+                // {
+                //     this.setLogic.SetParam.LogSavePath = this.setLogic.SetParam.FileSavePath;
+                // }
+            }
+            
+        }
+
+        if(this.flag.isCancelSet == Flag.ON)
+        {
+            // 此处恢复默认值
+            this.flag.isFollowFilePath = Flag.ON; // 生成的文件跟随转换文件路径
+            this.flag.isFollowLogPath = Flag.ON; // 日志自动跟随
+            this.setLogic.SetParam.FileSavePath = "/default";
+            this.setLogic.SetParam.LogSavePath = "/default";
+            this.setLogic.SetParam.HistorySize = 20; /// 默认成20个
+            // 刷新ui
+            this.mainWindow.Dispatcher.Invoke(() =>
+            {
+                this.mainWindow.HistorySizeValue.Text = this.setLogic.SetParam.HistorySize.ToString(); // 历史记录大小
+                this.mainWindow.SaveFilePath.Text = this.setLogic.SetParam.FileSavePath; // 文件保存路径
+                this.mainWindow.LogFilePath.Text = this.setLogic.SetParam.LogSavePath;   // 日志保存路径
+                 this.mainWindow.AutoGenerateCFile.IsChecked = false; // 取消自动生成c文件勾选
+                 this.mainWindow.EnableLogging.IsChecked = false; // 取消日志功能勾选
+            });
+        }
     }
 
 }

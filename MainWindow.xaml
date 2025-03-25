@@ -54,7 +54,7 @@
             </Border>
         </Grid>
 
-        <Grid x:Name="HistoryFile_Grid" Grid.Column="1">
+        <Grid x:Name="HistoryFile_Grid" Grid.Column="1" Visibility="Collapsed">
             <!-- 定义 2 行 -->
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -104,7 +104,7 @@
 
         <!-- 设置界面 -->
         <!-- 设置界面 -->
-        <Grid Grid.Column="1" Visibility="Collapsed" x:Name="SettingsPanel_Grid">
+        <Grid Grid.Column="1" Visibility="Visible" x:Name="SettingsPanel_Grid">
             <!-- 滚动容器 -->
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
                   HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -164,7 +164,7 @@
                                 <TextBlock Text="历史记录存储数量：" Margin="5"/>
                                 <StackPanel Orientation="Horizontal">
                                     <Slider x:Name="HistorySizeSlider" Minimum="10" Maximum="100" Value="20" TickFrequency="10"
-                                    IsSnapToTickEnabled="True" Width="200" Margin="5"/>
+                                    IsSnapToTickEnabled="True" Width="200" Margin="5" ValueChanged="HistorySizeValue_Changed"/>
                                     <TextBlock x:Name="HistorySizeValue" Text="20" VerticalAlignment="Center" FontWeight="Bold"/>
                                 </StackPanel>
                             </StackPanel>
@@ -173,7 +173,7 @@
                         <!-- 文件转换设置 -->
                         <GroupBox Header="文件转换" Margin="5">
                             <StackPanel>
-                                <CheckBox x:Name="AutoGenerateCFile" Content="✅ 自动生成 .c 文件" Margin="5"/>
+                                <CheckBox x:Name="AutoGenerateCFile" Content="✅ 自动生成 .c 文件" Margin="5" />
                                 <CheckBox x:Name="EnableLogging" Content="📝 启用日志记录" Margin="5"/>
                             </StackPanel>
                         </GroupBox>
@@ -215,16 +215,15 @@
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
                             <Button Content="💾 保存设置" Width="120" Height="40" Background="#0078D7" Foreground="White" FontWeight="Bold"
                             Margin="5" Click="SaveSettings_Click"/>
-                            <Button Content="🔄 取消" Width="100" Height="40" Background="#D9534F" Foreground="White" FontWeight="Bold"
-                            Margin="5"/>
+                            <Button Content="🔄 恢复默认" Width="100" Height="40" Background="#D9534F" Foreground="White" FontWeight="Bold"
+                            Margin="5" Click="CancelSettings_Click"/>
                         </StackPanel>
                     </StackPanel>
                 </Grid>
             </ScrollViewer>
         </Grid>
 
-
-
+        
 
     </Grid>
 </Window>
