@@ -1,16 +1,7 @@
 ﻿using System.Diagnostics;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using static APPDevice_Class;
-using System.Threading;
+using APPLogic;
 using UserTim;
 
 namespace FileConver
@@ -53,14 +44,14 @@ public partial class MainWindow : Window
         {
             if (userTimer.UserTimFlag.system1ms_Flag)
             {
-                Console.WriteLine("[线程] 处理 1ms 任务...");
+                    Debug.WriteLine("[线程] 处理 1ms 任务...");
                 userTimer.UserTimFlag.system1ms_Flag = false;
 
             }
 
             if (userTimer.UserTimFlag.system10ms_Flag)
             {
-                Console.WriteLine("[线程] 处理 10ms 任务...");
+                    Debug.WriteLine("[线程] 处理 10ms 任务...");
                 userTimer.UserTimFlag.system10ms_Flag = false;
                 // **在 UI 线程上调用 PageManage**
                 if (Application.Current != null && Application.Current.Dispatcher != null)
@@ -75,21 +66,21 @@ public partial class MainWindow : Window
 
             if (userTimer.UserTimFlag.system100ms_Flag)
             {
-                Console.WriteLine("[线程] 处理 100ms 任务...");
+                    Debug.WriteLine("[线程] 处理 100ms 任务...");
                 userTimer.UserTimFlag.system100ms_Flag = false;
                 AppDevice.DealWith_Front(); // 处理首页
             }
 
             if (userTimer.UserTimFlag.system500ms_Flag)
             {
-                Console.WriteLine("[线程] 处理 500ms 任务...");
+                    Debug.WriteLine("[线程] 处理 500ms 任务...");
                 userTimer.UserTimFlag.system500ms_Flag = false;
                 AppDevice.DealWith_History();
             }
 
             if (userTimer.UserTimFlag.system1000ms_Flag)
             {
-                Console.WriteLine("[线程] 处理 1000ms 任务...");
+                    Debug.WriteLine("[线程] 处理 1000ms 任务...");
                 userTimer.UserTimFlag.system1000ms_Flag = false;
             }
 
@@ -157,7 +148,7 @@ public partial class MainWindow : Window
     private void UartSend_butt(object sender, RoutedEventArgs e)
     {
         PageSel = PageSelect_t.UART_PAGE;
-        // PageManage(PageSel);
+      
     }
 
     // 清除历史

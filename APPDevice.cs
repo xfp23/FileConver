@@ -20,7 +20,7 @@ using System.Windows.Automation;
 using System.ComponentModel;
 using HistoryContent;
 
-
+namespace APPLogic{
 
 public class RelayCommand : ICommand
 {
@@ -283,5 +283,7 @@ public class APPDevice_Class // 设备类
         }
 
     }
+
+}
 
 }
