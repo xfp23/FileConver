@@ -2,6 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="文件转换助手" Height="450" Width="800"
+         Background="{DynamicResource BackgroundBrush}"
         Icon="D:\C#\project\FileConver\icon\favicon.ico">
     <!-- 根 Grid 作为主布局 -->
     <Grid>
@@ -15,11 +16,11 @@
 
         <!-- 侧边栏 -->
         <StackPanel Grid.Column="0" Background="#80000000" VerticalAlignment="Stretch" >
-            <Label Content="导航栏" Foreground="White" FontSize="24" HorizontalAlignment="Center" Margin="0,20,0,20"/>
-            <Button Content="首页" Background="White" Foreground="Black" Margin="5" Click="FrontePage_butt"/>
-            <Button Content="历史记录" Background="White" Foreground="Black" Margin="5" Click="HistoryRecord_butt"/>
-            <Button Content="设置" Background="White" Foreground="Black" Margin="5" Click="Setup_button"/>
-            <Button Content="串口发送" Background="White" Foreground="Black" Margin="5" Click="UartSend_butt"/>
+            <Label Content="导航栏" FontSize="24" HorizontalAlignment="Center" Margin="0,20,0,20"/>
+            <Button Content="首页"   Margin="5" Click="FrontePage_butt"/>
+            <Button Content="历史记录"  Margin="5" Click="HistoryRecord_butt"/>
+            <Button Content="设置"  Margin="5" Click="Setup_button"/>
+            <Button Content="串口发送"   Margin="5" Click="UartSend_butt"/>
         </StackPanel>
 
         <Grid Grid.Column="1" Margin="10" x:Name="FrontePage_Grid" Visibility="Collapsed">
@@ -34,7 +35,7 @@
             <StackPanel x:Name="PageButton_area" Orientation="Horizontal"
                 HorizontalAlignment="Center" Margin="0,0,0,10" Grid.Row="0">
                 <CheckBox x:Name="GenerateCFile_area" Content="生成 .c 文件"
-                  Foreground="Black" Margin="10,0" VerticalAlignment="Center"/>
+                   Margin="10,0" VerticalAlignment="Center"/>
                 <Button Content="上传文件" Width="120" Height="36" Background="#0078D7"
                 Foreground="White" FontWeight="Bold" Margin="10,0"
                 Click="Upload_butt" BorderThickness="0" Cursor="Hand"/>
@@ -49,7 +50,7 @@
                 <TextBox x:Name="MainOutput" VerticalScrollBarVisibility="Auto"
                  AcceptsReturn="True" TextWrapping="Wrap"
                  VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                 FontSize="14" Foreground="Black" Background="Transparent"
+                 FontSize="14"
                  BorderThickness="0" />
             </Border>
         </Grid>
@@ -71,7 +72,7 @@
           
             <DataGrid x:Name="HistoryFile_DataGrid" Margin="5" AutoGenerateColumns="False"
         HeadersVisibility="Column" CanUserAddRows="False" CanUserDeleteRows="False"
-        IsReadOnly="True" SelectionChanged="HistoryFile_DataGrid_SelectionChanged"
+        IsReadOnly="True" SelectionChanged="HistoryFile_DataGrid_SelectionChanged" Foreground="Black"
         ItemsSource="{Binding HistoryFiles}" Grid.Row="1">
 
                 <DataGrid.Columns>
@@ -86,9 +87,11 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Button Content="查看" Width="60" Height="25"
-                            Command="{Binding ShowDetailsCommand}" 
-                            CommandParameter="{Binding}"/>
+            Command="{Binding ShowDetailsCommand}" 
+            CommandParameter="{Binding}">
+                                </Button>
                             </DataTemplate>
+
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
@@ -119,22 +122,23 @@
                     </Grid.RowDefinitions>
 
                     <!-- 标题 -->
-                    <TextBlock Text="⚙ 设置" FontSize="24" FontWeight="Bold" Margin="10" Foreground="Black"/>
+                    <TextBlock Text="⚙ 设置" FontSize="24" FontWeight="Bold" Margin="10"/>
 
                     <!-- 主内容区 -->
                     <StackPanel Grid.Row="1" Margin="10">
 
                         <!-- 主题设置 -->
-                        <GroupBox Header="外观设置" Margin="5">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="选择主题：" VerticalAlignment="Center" Margin="5"/>
-                                <ComboBox x:Name="ThemeSelector" Width="150" Margin="5" SelectionChanged = "ThemeSelector_Changed">
-                                    <ComboBoxItem Content="🌞 浅色模式" IsSelected="False" Tag="LightMode"/>
-                                    <ComboBoxItem Content="🌙 深色模式" Tag="DarkMode"/>
-                                    <ComboBoxItem Content="🔄跟随系统" IsSelected="True" Tag="AutoMode"/>
-                                </ComboBox>
-                            </StackPanel>
-                        </GroupBox>
+<GroupBox Header="外观设置" Margin="5">
+    <StackPanel Orientation="Horizontal">
+        <TextBlock Text="选择主题：" VerticalAlignment="Center" Margin="5"/>
+        <ComboBox x:Name="ThemeSelector" Width="150" Margin="5" SelectionChanged="ThemeSelector_Changed" Foreground="Orange">
+            <ComboBoxItem Content="🌞 浅色模式" IsSelected="False" Tag="LightMode"/>
+            <ComboBoxItem Content="🌙 深色模式" Tag="DarkMode" />
+            <ComboBoxItem Content="🔄跟随系统" IsSelected="True" Tag="AutoMode" />
+        </ComboBox>
+    </StackPanel>
+</GroupBox>
+
 
                         <!-- 文件路径设置 -->
                         <GroupBox Header="文件存储路径" Margin="5">

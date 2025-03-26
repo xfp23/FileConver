@@ -402,20 +402,25 @@ namespace APPLogic
                 this.mainWindow.LogFilePath.Text = param.LogSavePath;   // 日志保存路径
                 this.mainWindow.AutoGenerateCFile.IsChecked = param.AutoGenerateC; // 设置自动生成C文件
                 this.mainWindow.EnableLogging.IsChecked = param.GenerateLog; // 设置生成日志
-                switch(param.DisplayMode )
+
+                foreach (var item in this.mainWindow.DataFormate_ComboBox.Items)
                 {
-                    case SettingLogic_Class.DisplayMode_t.AutoMode: // 自动的
-                        // 需要获取系统是正常模式还是黑夜模式
+                    if (item is ComboBoxItem comboBoxItem && comboBoxItem.Tag.ToString() == param.Dataformate.ToString())
+                    {
+                        this.mainWindow.DataFormate_ComboBox.SelectedItem = comboBoxItem;
                         break;
-                    case SettingLogic_Class.DisplayMode_t.LightMode:
-                        // 这里翻转颜色，全部变成白色背景黑色字体
-                        break;
-                    case SettingLogic_Class.DisplayMode_t.DarkMode:
-                        // 这里翻转夜色，全部变成黑色背景白色字体
-                        break;
-                    default:
-                        break;
+                    }
                 }
+
+                foreach (var item in this.mainWindow.ThemeSelector.Items)
+                {
+                    if (item is ComboBoxItem comboBoxItem && comboBoxItem.Tag.ToString() == param.DisplayMode.ToString())
+                    {
+                        this.mainWindow.ThemeSelector.SelectedItem = comboBoxItem;
+                        break;
+                    }
+                }
+
             });
         }
 
@@ -596,6 +601,27 @@ namespace APPLogic
                 this.flag.isLocalSetUpdate = Flag.ON;
             }
         }
+
+        /**
+         * 切换主题
+        */
+        // private void ThemeManager(SettingLogic_Class.DisplayMode_t mode)
+        // {
+        //     switch(mode)
+        //     {
+        //         case SettingLogic_Class.DisplayMode_t.AutoMode:
+                
+        //         break;
+        //         case SettingLogic_Class.DisplayMode_t.DarkMode:
+
+        //         // 黑夜模式
+        //         break;
+        //         case SettingLogic_Class.DisplayMode_t.LightMode:
+
+        //         // 白天模式
+        //         break;
+        //     }
+        // }
 
     }
 
