@@ -128,10 +128,10 @@
                         <GroupBox Header="外观设置" Margin="5">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="选择主题：" VerticalAlignment="Center" Margin="5"/>
-                                <ComboBox x:Name="ThemeSelector" Width="150" Margin="5">
-                                    <ComboBoxItem Content="🌞 浅色模式" IsSelected="False"/>
-                                    <ComboBoxItem Content="🌙 深色模式"/>
-                                    <ComboBoxItem Content="🔄跟随系统" IsSelected="True"/>
+                                <ComboBox x:Name="ThemeSelector" Width="150" Margin="5" SelectionChanged = "ThemeSelector_Changed">
+                                    <ComboBoxItem Content="🌞 浅色模式" IsSelected="False" Tag="LightMode"/>
+                                    <ComboBoxItem Content="🌙 深色模式" Tag="DarkMode"/>
+                                    <ComboBoxItem Content="🔄跟随系统" IsSelected="True" Tag="AutoMode"/>
                                 </ComboBox>
                             </StackPanel>
                         </GroupBox>
@@ -189,14 +189,14 @@
                                 <!-- 选择数据格式 -->
                                 <StackPanel Margin="5">
                                     <TextBlock Text="数据格式：" Margin="5"/>
-                                    <ComboBox x:Name="DataFormate_ComboBox" Height="30" Width="150">
-                                        <ComboBoxItem Content="📁 全部" IsSelected="True"/>
-                                        <ComboBoxItem Content="🖼 PNG"/>
-                                        <ComboBoxItem Content="📷 JPG"/>
-                                        <ComboBoxItem Content="🎵 WAV"/>
-                                        <ComboBoxItem Content="🎶 MP3"/>
-                                        <ComboBoxItem Content="🔢 HEX"/>
-                                        <ComboBoxItem Content="💾 BIN"/>
+                                    <ComboBox x:Name="DataFormate_ComboBox" Height="30" Width="150" SelectionChanged="DataFormat_ComboBox_SelectionChanged">
+                                        <ComboBoxItem Tag ="ALL" Content="📁 全部" IsSelected="True"/>
+                                        <ComboBoxItem Tag ="PNG" Content="🖼 PNG"/>
+                                        <ComboBoxItem Tag ="JPG" Content="📷 JPG"/>
+                                        <ComboBoxItem Tag ="WAV" Content="🎵 WAV"/>
+                                        <ComboBoxItem Tag ="MP3" Content="🎶 MP3"/>
+                                        <ComboBoxItem Tag ="HEX" Content="🔢 HEX"/>
+                                        <ComboBoxItem Tag ="BIN" Content="💾 BIN"/>
                                     </ComboBox>
                                 </StackPanel>
 
@@ -204,8 +204,8 @@
                                 <StackPanel Margin="5" Grid.Column="1">
                                     <TextBlock Text="保留文件头：" Margin="5"/>
                                     <ComboBox x:Name="SaveFileHeader_ComboBox" Height="30" Width="120">
-                                        <ComboBoxItem Content="✅ 是" IsSelected="True"/>
-                                        <ComboBoxItem Content="❌ 否"/>
+                                        <ComboBoxItem x:Name="yes" Content="✅ 是" IsSelected="True"/>
+                                        <ComboBoxItem x:Name="no" Content="❌ 否"/>
                                     </ComboBox>
                                 </StackPanel>
                             </Grid>
