@@ -16,7 +16,7 @@
 
         <!-- 侧边栏 -->
         <StackPanel Grid.Column="0" Background="#80000000" VerticalAlignment="Stretch" >
-            <Label Content="导航栏" FontSize="24" HorizontalAlignment="Center" Margin="0,20,0,20"/>
+            <Label Content="导航栏" FontSize="24" HorizontalAlignment="Center" Margin="0,20,0,20" Foreground="#FF8C00"/>
             <Button Content="首页"   Margin="5" Click="FrontePage_butt"/>
             <Button Content="历史记录"  Margin="5" Click="HistoryRecord_butt"/>
             <Button Content="设置"  Margin="5" Click="Setup_button"/>
@@ -86,7 +86,7 @@
                     <DataGridTemplateColumn Header="转换结果" Width="Auto">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Content="查看" Width="60" Height="25"
+                                <Button Content="..." Width="60" Height="25"
             Command="{Binding ShowDetailsCommand}" 
             CommandParameter="{Binding}">
                                 </Button>
@@ -122,7 +122,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- 标题 -->
-                    <TextBlock Text="⚙ 设置" FontSize="24" FontWeight="Bold" Margin="10"/>
+                    <TextBlock Text="⚙ 设置" FontSize="24" FontWeight="Bold" Margin="10" Foreground="#00FA9A"/><!--Style="{StaticResource DarkTextBlockStyle}"-->
 
                     <!-- 主内容区 -->
                     <StackPanel Grid.Row="1" Margin="10">
@@ -131,7 +131,7 @@
 <GroupBox Header="外观设置" Margin="5">
     <StackPanel Orientation="Horizontal">
         <TextBlock Text="选择主题：" VerticalAlignment="Center" Margin="5"/>
-        <ComboBox x:Name="ThemeSelector" Width="150" Margin="5" SelectionChanged="ThemeSelector_Changed" Foreground="Orange">
+        <ComboBox x:Name="ThemeSelector" Width="150" Margin="5" SelectionChanged="ThemeSelector_Changed">
             <ComboBoxItem Content="🌞 浅色模式" IsSelected="False" Tag="LightMode"/>
             <ComboBoxItem Content="🌙 深色模式" Tag="DarkMode" />
             <ComboBoxItem Content="🔄跟随系统" IsSelected="True" Tag="AutoMode" />

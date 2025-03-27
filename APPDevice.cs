@@ -21,6 +21,7 @@ using System.ComponentModel;
 using HistoryContent;
 using System.Security.Cryptography;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using System.ComponentModel.Design;
 
 namespace APPLogic
 {
@@ -41,6 +42,7 @@ namespace APPLogic
             this.SetParam.DisplayMode = DisplayMode_t.AutoMode; // 跟随系统
             this.SetParam.Dataformate = DataFormate_t.ALL;
             DisplayMode_StringTemp = "AutoMode";
+
         }
         public enum DisplayMode_t
         {
@@ -160,6 +162,8 @@ namespace APPLogic
             public Flag isExitSetupPage;      // 退出setup的时候恢复页面
             public Flag isUpdateThemes;       // 更新了主题
             public Flag isUpdateDataFormate; // 更新了数据格式
+            public Flag isMonitorSysThemeChanged; // 是否监听系统主题变化
+
 
         };
 
@@ -178,8 +182,9 @@ namespace APPLogic
             Title = "选择一个文件",
             Filter = "所有文件 (*.*)|*.*", // 允许所有文件,
             Multiselect = false
-        };
+        }; // 选择文件
         private ObservableCollection<HistoryFile> historyFile { get; set; }
+        ResourceDictionary GlobalTheme;
 
         // 构造函数
         public APPDevice_Class(MainWindow window)
@@ -193,6 +198,7 @@ namespace APPLogic
             });
             setLogic = new SettingLogic_Class();
             setLogic_buff = new SettingLogic_Class();
+            GlobalTheme = new ResourceDictionary();
             this.flag.isFollowFilePath = Flag.ON;
             this.flag.isFollowLogPath = Flag.ON;  
         }
@@ -420,6 +426,41 @@ namespace APPLogic
                         break;
                     }
                 }
+                if(this.flag.isUpdateThemes == Flag.ON)
+                {
+                    this.flag.isUpdateThemes = Flag.OFF;
+                    if (param.DisplayMode == SettingLogic_Class.DisplayMode_t.LightMode)
+                    {
+                        GlobalTheme.Source = new Uri("Themes/LightTheme.xaml", UriKind.Relative);
+
+                    }
+                    else if (param.DisplayMode == SettingLogic_Class.DisplayMode_t.DarkMode)
+                    {
+                        GlobalTheme.Source = new Uri("Themes/DarkTheme.xaml", UriKind.Relative);
+                    }
+                    else if(param.DisplayMode == SettingLogic_Class.DisplayMode_t.AutoMode)
+                    {
+                        switch(GetSystem_Themes())
+                        {
+                            case SettingLogic_Class.DisplayMode_t.DarkMode:
+                            GlobalTheme.Source = new Uri("Themes/DarkTheme.xaml", UriKind.Relative);
+                            break;
+
+                            case SettingLogic_Class.DisplayMode_t.LightMode:
+                            GlobalTheme.Source = new Uri("Themes/LightTheme.xaml", UriKind.Relative);
+                            break;
+                            default:
+
+                            break;
+                        }
+                        
+                    }
+
+                    Application.Current.Resources.MergedDictionaries.Clear();
+                    Application.Current.Resources.MergedDictionaries.Add(GlobalTheme);
+                }
+
+                this.mainWindow.HistorySizeSlider.Value = param.HistorySize;
 
             });
         }
@@ -505,7 +546,7 @@ namespace APPLogic
                         break;
                     }
                 }
-
+                this.mainWindow.HistorySizeSlider.Value = 20;
             });
         }
 
@@ -530,7 +571,7 @@ namespace APPLogic
                 this.flag.isLocalSetUpdate = Flag.OFF;
                 if(this.flag.isUpdateThemes == Flag.ON)
                 {
-                    this.flag.isUpdateThemes = Flag.OFF;
+                    //this.flag.isUpdateThemes = Flag.OFF; // 这里先不要关掉标志位，，这里主题还没刷
                     Check_ItemBox(ref setLogic_buff.SetParam.DisplayMode);
                 }
                     
@@ -603,28 +644,34 @@ namespace APPLogic
         }
 
         /**
-         * 切换主题
-        */
-        // private void ThemeManager(SettingLogic_Class.DisplayMode_t mode)
-        // {
-        //     switch(mode)
-        //     {
-        //         case SettingLogic_Class.DisplayMode_t.AutoMode:
-                
-        //         break;
-        //         case SettingLogic_Class.DisplayMode_t.DarkMode:
+         * 
+         * 获取系统主题
+         */
+        private const string RegistryKeyPath = @"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize";
+        private const string RegistryValueName = "AppsUseLightTheme";
+        private SettingLogic_Class.DisplayMode_t GetSystem_Themes()
+        {
+            object themeValue = Registry.GetValue(RegistryKeyPath, RegistryValueName, 1);
+            return (themeValue is int value && value == 0) ? SettingLogic_Class.DisplayMode_t.DarkMode : SettingLogic_Class.DisplayMode_t.LightMode;
+        }
 
-        //         // 黑夜模式
-        //         break;
-        //         case SettingLogic_Class.DisplayMode_t.LightMode:
-
-        //         // 白天模式
-        //         break;
-        //     }
-        // }
+        /**
+         * 监听主题变化
+         */
+        public void MonitorSystemTheme()
+        {
+            if(this.setLogic_buff.SetParam.DisplayMode == SettingLogic_Class.DisplayMode_t.AutoMode
+                || this.setLogic.SetParam.DisplayMode == SettingLogic_Class.DisplayMode_t.AutoMode)
+            SystemEvents.UserPreferenceChanged += (sender, e) =>
+            {
+                if (e.Category == UserPreferenceCategory.General)
+                {
+                    this.flag.isLocalSetUpdate = Flag.ON;
+                    this.flag.isUpdateThemes = Flag.ON;
+                }
+            };
+        }
 
     }
-
-
 
 }

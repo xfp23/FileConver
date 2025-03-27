@@ -86,6 +86,7 @@ namespace FileConver
                 {
                     Debug.WriteLine("[线程] 处理 1000ms 任务...");
                     userTimer.UserTimFlag.system1000ms_Flag = false;
+                    AppDevice.MonitorSystemTheme();
                 }
 
                 // 避免 CPU 过载

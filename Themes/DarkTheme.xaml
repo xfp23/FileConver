@@ -14,9 +14,10 @@
     <SolidColorBrush x:Key="ButtonForegroundBrush" Color="{StaticResource ButtonForegroundColor}"/>
 
     <!-- 设置 TextBlock 默认字体颜色 -->
-    <Style TargetType="TextBlock">
-        <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
+    <Style x:Key="DarkTextBlockStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="#00FA9A"/>
     </Style>
+
 
     <!-- 设置 Button 样式 -->
     <Style TargetType="Button">
@@ -56,12 +57,12 @@
     <!-- 复选框的样式 -->
     <Style TargetType="CheckBox">
         <Setter Property="Foreground" Value="White"/>
-        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Background" Value="Black"/>
         <Style.Triggers>
-            <!-- 选中复选框时的样式 -->
+            
             <Trigger Property="IsChecked" Value="True">
-                <Setter Property="Background" Value="#666666"/>
-                <Setter Property="Foreground" Value="Black"/>
+                <Setter Property="Background" Value="White"/>
+                <!--<Setter Property="Foreground" Value="Transparent"/>-->
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -71,7 +72,6 @@
     </Style>
 
     <Style TargetType="DataGrid">
-        <!-- 设置数据行的背景和前景色 -->
         <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
         <Setter Property="GridLinesVisibility" Value="All"/>
@@ -89,10 +89,12 @@
 
 
     <Style TargetType="ComboBox">
-        <Setter Property="Foreground" Value="Orange"/>
+        <Setter Property="Foreground" Value="#0F172A"/>
     </Style>
     <Style TargetType="ComboBoxItem">
-        <Setter Property="Foreground" Value="Orange"/>
+ 
+        <Setter Property="Background" Value="#0F172A"/>
+        <Setter Property="Foreground" Value="#00FFFF"/>
     </Style>
 
 </ResourceDictionary>
