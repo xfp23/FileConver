@@ -48,7 +48,7 @@ namespace FileConver
                 {
                     Debug.WriteLine("[线程] 处理 1ms 任务...");
                     userTimer.UserTimFlag.system1ms_Flag = false;
-
+                    AppDevice.MonitorSystemTheme();
                 }
 
                 if (userTimer.UserTimFlag.system10ms_Flag)
@@ -63,7 +63,9 @@ namespace FileConver
                             PageManage(PageSel);
                         });
                     }
+                    //PageManage(PageSel);
                     AppDevice.DealWith_Front(); // 处理首页
+                    AppDevice.DealWith_SysFlagUpdate();
 
                 }
 
@@ -78,7 +80,7 @@ namespace FileConver
                 {
                     Debug.WriteLine("[线程] 处理 500ms 任务...");
                     userTimer.UserTimFlag.system500ms_Flag = false;
-                    AppDevice.DealWith_SysFlagUpdate();
+                   
                     AppDevice.DealWith_SetPage(); // 处理设置页面
                 }
 
@@ -86,7 +88,7 @@ namespace FileConver
                 {
                     Debug.WriteLine("[线程] 处理 1000ms 任务...");
                     userTimer.UserTimFlag.system1000ms_Flag = false;
-                    AppDevice.MonitorSystemTheme();
+                   
                 }
 
                 // 避免 CPU 过载
@@ -245,6 +247,17 @@ namespace FileConver
             if (ThemeSelector.SelectedItem is ComboBoxItem selectedItem)
             {
                 AppDevice.setLogic_buff.DisplayMode_StringTemp = selectedItem.Tag.ToString();
+            }
+        }
+
+        private void SaveFileHeader_ComboBoxChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (sender == null || AppDevice == null) return; // 非空检查
+            AppDevice.flag.isLocalSetUpdate = Flag.ON;
+            AppDevice.flag.isUpdateFileHeader = Flag.ON;
+            if (SaveFileHeader_ComboBox.SelectedItem is ComboBoxItem selectedItem)
+            {
+                AppDevice.setLogic_buff.SaveFileHeader_StringTemp = selectedItem.Tag.ToString();
             }
         }
 

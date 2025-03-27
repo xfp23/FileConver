@@ -41,8 +41,10 @@ namespace APPLogic
             this.SetParam.GenerateLog = false;
             this.SetParam.DisplayMode = DisplayMode_t.AutoMode; // 跟随系统
             this.SetParam.Dataformate = DataFormate_t.ALL;
+            this.SetParam.SaveFileHeader = SaveFileHeader_t.YES;
             DisplayMode_StringTemp = "AutoMode";
-
+            SaveFileHeader_StringTemp = "YES";
+            DataFormate_StringTemp = "ALL";
         }
         public enum DisplayMode_t
         {
@@ -65,6 +67,12 @@ namespace APPLogic
             PNG,
         };
 
+        // 保存文件头类型枚举
+        public enum SaveFileHeader_t
+        {
+            YES, // 保存 对应xaml里的Tag
+            NO // 不保存
+        };
         // 系统运行的参数
         public struct setParm_t
         {
@@ -75,12 +83,13 @@ namespace APPLogic
             public bool AutoGenerateC; // 自动生成C文件
             public bool GenerateLog; // 生成日志
             public DataFormate_t Dataformate; // 数据格式
-
+            public SaveFileHeader_t SaveFileHeader; // 保存文件头?  这个作用是区分只要数据还是整个文件
         };
 
         public setParm_t SetParam;
         public string DisplayMode_StringTemp; // 显示模式的字符串缓存
         public string DataFormate_StringTemp; // 数据格式字符串缓存
+        public string SaveFileHeader_StringTemp; // 是否保存文件头字符串缓存
     }
 
 
@@ -163,7 +172,8 @@ namespace APPLogic
             public Flag isUpdateThemes;       // 更新了主题
             public Flag isUpdateDataFormate; // 更新了数据格式
             public Flag isMonitorSysThemeChanged; // 是否监听系统主题变化
-
+            public Flag isInitMonitorTheme;       // 初始化监听主题
+            public Flag isUpdateFileHeader;       // 是否更新保存文件头
 
         };
 
@@ -174,7 +184,7 @@ namespace APPLogic
         public bool FileAlreadyUpload = false;
         public APPDevice_Flag flag = default(APPDevice_Flag);
         public SettingLogic_Class setLogic_buff;
-        
+
         private UInt16 historySize = 0;
         private UInt16 historyIndex = 0;
         private static OpenFileDialog openFileDialog = new OpenFileDialog
@@ -200,7 +210,8 @@ namespace APPLogic
             setLogic_buff = new SettingLogic_Class();
             GlobalTheme = new ResourceDictionary();
             this.flag.isFollowFilePath = Flag.ON;
-            this.flag.isFollowLogPath = Flag.ON;  
+            this.flag.isFollowLogPath = Flag.ON;
+            this.flag.isInitMonitorTheme = Flag.ON;
         }
         /**
             *  此方法上传文件
@@ -409,15 +420,6 @@ namespace APPLogic
                 this.mainWindow.AutoGenerateCFile.IsChecked = param.AutoGenerateC; // 设置自动生成C文件
                 this.mainWindow.EnableLogging.IsChecked = param.GenerateLog; // 设置生成日志
 
-                foreach (var item in this.mainWindow.DataFormate_ComboBox.Items)
-                {
-                    if (item is ComboBoxItem comboBoxItem && comboBoxItem.Tag.ToString() == param.Dataformate.ToString())
-                    {
-                        this.mainWindow.DataFormate_ComboBox.SelectedItem = comboBoxItem;
-                        break;
-                    }
-                }
-
                 foreach (var item in this.mainWindow.ThemeSelector.Items)
                 {
                     if (item is ComboBoxItem comboBoxItem && comboBoxItem.Tag.ToString() == param.DisplayMode.ToString())
@@ -426,9 +428,38 @@ namespace APPLogic
                         break;
                     }
                 }
-                if(this.flag.isUpdateThemes == Flag.ON)
+                // if(this.flag.isUpdateDataFormate == Flag.ON)
+                {
+                   // this.flag.isUpdateDataFormate = Flag.OFF;
+                    foreach (var item in this.mainWindow.DataFormate_ComboBox.Items)
+                    {
+                        if (item is ComboBoxItem comboBoxItem && comboBoxItem.Tag.ToString() == param.Dataformate.ToString())
+                        {
+                            this.mainWindow.DataFormate_ComboBox.SelectedItem = comboBoxItem;
+                            break;
+                        }
+                    }
+                }
+
+              //  if(this.flag.isUpdateFileHeader == Flag.ON)
+                {
+                    // this.flag.isUpdateFileHeader = Flag.OFF;
+                    foreach (var item in this.mainWindow.SaveFileHeader_ComboBox.Items)
+                    {
+                      if (item is ComboBoxItem comboBoxItem && comboBoxItem.Tag.ToString() == param.SaveFileHeader.ToString())
+                        {
+                            this.mainWindow.SaveFileHeader_ComboBox.SelectedItem = comboBoxItem;
+                            break;
+                        }
+                    }
+                }
+
+
+               if (this.flag.isUpdateThemes == Flag.ON)
                 {
                     this.flag.isUpdateThemes = Flag.OFF;
+
+ 
                     if (param.DisplayMode == SettingLogic_Class.DisplayMode_t.LightMode)
                     {
                         GlobalTheme.Source = new Uri("Themes/LightTheme.xaml", UriKind.Relative);
@@ -459,8 +490,11 @@ namespace APPLogic
                     Application.Current.Resources.MergedDictionaries.Clear();
                     Application.Current.Resources.MergedDictionaries.Add(GlobalTheme);
                 }
-
+                // 更新滑动条的数值
                 this.mainWindow.HistorySizeSlider.Value = param.HistorySize;
+
+                // 更新是否保留文件头的下拉框
+                //this.mainWindow.SaveFileHeader_ComboBox.SetValue();
 
             });
         }
@@ -580,7 +614,14 @@ namespace APPLogic
                     this.flag.isUpdateDataFormate = Flag.OFF;
                     Check_ItemBox(ref setLogic_buff.SetParam.Dataformate);
                 }
-                    
+                
+                if(this.flag.isUpdateFileHeader == Flag.ON)
+                {
+                    this.flag.isUpdateFileHeader = Flag.OFF;
+
+                    UpdateSave_FileHeader(ref setLogic_buff);
+                }
+
                 UpdateSetPage_Page(setLogic_buff.SetParam); // 刷ui
 
             }
@@ -626,14 +667,18 @@ namespace APPLogic
         // 系统标志位自更新
         public void DealWith_SysFlagUpdate()
         {
-            Application.Current.Dispatcher.Invoke(() => {
-                setLogic_buff.SetParam.AutoGenerateC = this.mainWindow.AutoGenerateCFile.IsChecked ?? false; // 检查复选框状态
-                setLogic_buff.SetParam.GenerateLog = this.mainWindow.EnableLogging.IsChecked ?? false;
-            });
- 
+            if (Application.Current?.Dispatcher == null) return; // 非空检查，保护软件安全
+            
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    setLogic_buff.SetParam.AutoGenerateC = this.mainWindow.AutoGenerateCFile.IsChecked ?? false;
+                    setLogic_buff.SetParam.GenerateLog = this.mainWindow.EnableLogging.IsChecked ?? false;
+                });
+            
 
 
-            if(setLogic_buff.SetParam.AutoGenerateC != setLogic.SetParam.AutoGenerateC)
+
+            if (setLogic_buff.SetParam.AutoGenerateC != setLogic.SetParam.AutoGenerateC)
             {
                 this.flag.isLocalSetUpdate = Flag.ON; // 开始局部刷新
             }
@@ -662,14 +707,42 @@ namespace APPLogic
         {
             if(this.setLogic_buff.SetParam.DisplayMode == SettingLogic_Class.DisplayMode_t.AutoMode
                 || this.setLogic.SetParam.DisplayMode == SettingLogic_Class.DisplayMode_t.AutoMode)
-            SystemEvents.UserPreferenceChanged += (sender, e) =>
             {
-                if (e.Category == UserPreferenceCategory.General)
+                if(this.flag.isInitMonitorTheme == Flag.ON)
                 {
+                    this.flag.isInitMonitorTheme = Flag.OFF;
                     this.flag.isLocalSetUpdate = Flag.ON;
                     this.flag.isUpdateThemes = Flag.ON;
                 }
-            };
+                SystemEvents.UserPreferenceChanged += (sender, e) =>
+                {
+                    if (e.Category == UserPreferenceCategory.General )
+                    {
+                        this.flag.isLocalSetUpdate = Flag.ON;
+                        this.flag.isUpdateThemes = Flag.ON;
+                    }
+                };
+            }
+
+        }
+
+        /**
+         * 更新是否保留头文件的系统参数
+         */
+        private void UpdateSave_FileHeader(ref SettingLogic_Class param)
+        {
+            switch(param.SaveFileHeader_StringTemp)
+            {
+                case "YES":
+                    param.SetParam.SaveFileHeader = SettingLogic_Class.SaveFileHeader_t.YES;
+                    break;
+                case "NO":
+                    param.SetParam.SaveFileHeader = SettingLogic_Class.SaveFileHeader_t.NO;
+                    break;
+                default:
+                    param.SetParam.SaveFileHeader = SettingLogic_Class.SaveFileHeader_t.YES;
+                    break;
+            }
         }
 
     }

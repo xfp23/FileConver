@@ -207,9 +207,9 @@
                                 <!-- 选择是否保留文件头 -->
                                 <StackPanel Margin="5" Grid.Column="1">
                                     <TextBlock Text="保留文件头：" Margin="5"/>
-                                    <ComboBox x:Name="SaveFileHeader_ComboBox" Height="30" Width="120">
-                                        <ComboBoxItem x:Name="yes" Content="✅ 是" IsSelected="True"/>
-                                        <ComboBoxItem x:Name="no" Content="❌ 否"/>
+                                    <ComboBox x:Name="SaveFileHeader_ComboBox" Height="30" Width="120" SelectionChanged ="SaveFileHeader_ComboBoxChanged">
+                                        <ComboBoxItem Tag ="YES" Content="✅ 是" IsSelected="True"/>
+                                        <ComboBoxItem Tag ="NO" Content="❌ 否"/>
                                     </ComboBox>
                                 </StackPanel>
                             </Grid>
