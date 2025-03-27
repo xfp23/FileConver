@@ -380,6 +380,7 @@ namespace APPLogic
         public void DealWith_Front()
         {
             string content = null;
+            bool generC_temp = false;
 
             if (this.flag.isUploadFile == Flag.ON)
             {
@@ -389,39 +390,53 @@ namespace APPLogic
 
             if (this.flag.isStartConvertButt == Flag.ON)
             {
-
                 this.flag.isStartConvertButt = Flag.OFF;
                 this.flag.isFileAlUpload = Flag.OFF;
+
                 if (this.setLogic.SetParam.AutoGenerateC == true)
                 {
-                   // this.mainWindow.GenerateCFile_area.IsChecked = true;
-                   content = this.GenerCArray(true);
+                    content = this.GenerCArray(true);
                 }
                 else
                 {
                     if (this.flag.ischkGenCFile == Flag.ON)
                     {
-                        // 生成并更新 C 数组内容到 MainOutput
-                         content = this.GenerCArray(true);
+                        content = this.GenerCArray(true);
                     }
                     else
                     {
-                        // 生成并更新 C 数组内容到 MainOutput
-                       content = this.GenerCArray(false);
+                        content = this.GenerCArray(false);
                     }
                 }
-                mainWindow.Dispatcher.Invoke(() =>{mainWindow.MainOutput.Text = content;});
-            }
-            mainWindow.Dispatcher.Invoke(() =>
-            {
-                if (this.setLogic.SetParam.AutoGenerateC == true)
+
+                if (mainWindow?.Dispatcher != null && !mainWindow.Dispatcher.HasShutdownStarted)
                 {
-                    this.mainWindow.GenerateCFile_area.IsChecked = true;
+                    mainWindow.Dispatcher.Invoke(() =>
+                    {
+                        if (mainWindow.MainOutput != null)
+                        {
+                            mainWindow.MainOutput.Text = content;
+                        }
+                        generC_temp = this.mainWindow.GenerateCFile_area?.IsChecked ?? false;
+                    });
                 }
-            });
+            }
 
-
+            if (this.setLogic.SetParam.AutoGenerateC == true && generC_temp == false)
+            {
+                if (mainWindow?.Dispatcher != null && !mainWindow.Dispatcher.HasShutdownStarted)
+                {
+                    mainWindow.Dispatcher.InvokeAsync(() =>
+                    {
+                        if (this.mainWindow.GenerateCFile_area != null)
+                        {
+                            this.mainWindow.GenerateCFile_area.IsChecked = true;
+                        }
+                    });
+                }
+            }
         }
+
 
         // 更新设置界面
         private void UpdateSetPage_Page(SettingLogic_Class.setParm_t param)

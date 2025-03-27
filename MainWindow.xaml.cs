@@ -56,13 +56,14 @@ namespace FileConver
                     Debug.WriteLine("[线程] 处理 10ms 任务...");
                     userTimer.UserTimFlag.system10ms_Flag = false;
                     // **在 UI 线程上调用 PageManage**
-                    if (Application.Current != null && Application.Current.Dispatcher != null)
+                    if (Application.Current?.Dispatcher != null && !Application.Current.Dispatcher.HasShutdownStarted)
                     {
                         Application.Current.Dispatcher.Invoke(() =>
                         {
                             PageManage(PageSel);
                         });
                     }
+
                     //PageManage(PageSel);
                     AppDevice.DealWith_Front(); // 处理首页
                     AppDevice.DealWith_SysFlagUpdate();
