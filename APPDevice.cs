@@ -379,6 +379,7 @@ namespace APPLogic
         // 处理首页
         public void DealWith_Front()
         {
+            string content = null;
 
             if (this.flag.isUploadFile == Flag.ON)
             {
@@ -386,26 +387,39 @@ namespace APPLogic
                 this.Upload_File();
             }
 
-
             if (this.flag.isStartConvertButt == Flag.ON)
             {
 
                 this.flag.isStartConvertButt = Flag.OFF;
                 this.flag.isFileAlUpload = Flag.OFF;
-                mainWindow.Dispatcher.Invoke(() =>
+                if (this.setLogic.SetParam.AutoGenerateC == true)
+                {
+                   // this.mainWindow.GenerateCFile_area.IsChecked = true;
+                   content = this.GenerCArray(true);
+                }
+                else
                 {
                     if (this.flag.ischkGenCFile == Flag.ON)
                     {
                         // 生成并更新 C 数组内容到 MainOutput
-                        mainWindow.MainOutput.Text = this.GenerCArray(true);
+                         content = this.GenerCArray(true);
                     }
                     else
                     {
                         // 生成并更新 C 数组内容到 MainOutput
-                        mainWindow.MainOutput.Text = this.GenerCArray(false);
+                       content = this.GenerCArray(false);
                     }
-                });
+                }
+                mainWindow.Dispatcher.Invoke(() =>{mainWindow.MainOutput.Text = content;});
             }
+            mainWindow.Dispatcher.Invoke(() =>
+            {
+                if (this.setLogic.SetParam.AutoGenerateC == true)
+                {
+                    this.mainWindow.GenerateCFile_area.IsChecked = true;
+                }
+            });
+
 
         }
 
