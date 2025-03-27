@@ -435,7 +435,7 @@ namespace APPLogic
                     });
                 }
             }
-        }
+        } 
 
 
         // 更新设置界面
