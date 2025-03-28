@@ -37,6 +37,7 @@ namespace FileConver
             workerThread.Start();
         }
 
+
         // while(1)
         private void Taskloop()
         {
@@ -89,7 +90,7 @@ namespace FileConver
                 {
                     Debug.WriteLine("[线程] 处理 1000ms 任务...");
                     userTimer.UserTimFlag.system1000ms_Flag = false;
-                   
+                    AppDevice.DealWith_Log();
                 }
 
                 // 避免 CPU 过载
@@ -130,6 +131,7 @@ namespace FileConver
             {
                 AppDevice.flag.isInitHistoryList = Flag.OFF;
             }
+
         }
 
         // 设置按钮导航栏

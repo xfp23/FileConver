@@ -22,11 +22,12 @@ using HistoryContent;
 using System.Security.Cryptography;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.ComponentModel.Design;
+using Device_Log; // 设备日志
 
 namespace APPLogic
 {
 
-    public class SettingLogic_Class  // 设置界面
+    public class SettingLogic_Class  // 设置对象
     {
         // 构造函数
         public SettingLogic_Class()
@@ -174,6 +175,11 @@ namespace APPLogic
             public Flag isMonitorSysThemeChanged; // 是否监听系统主题变化
             public Flag isInitMonitorTheme;       // 初始化监听主题
             public Flag isUpdateFileHeader;       // 是否更新保存文件头
+            public Flag isNeedInitLog;           // 是否需要初始化日志
+            public Flag isGenSetLog;            // 生成设置日志
+            public Flag isGenFrontLog;          // 生成首页日志
+            public Flag isGenHistoryLog;         // 生成历史日志
+            public Flag isGenUartLog;            // 生成串口日志
 
         };
 
@@ -187,6 +193,7 @@ namespace APPLogic
 
         private UInt16 historySize = 0;
         private UInt16 historyIndex = 0;
+        private AppLog_Class Log;
         private static OpenFileDialog openFileDialog = new OpenFileDialog
         {
             Title = "选择一个文件",
@@ -212,6 +219,7 @@ namespace APPLogic
             this.flag.isFollowFilePath = Flag.ON;
             this.flag.isFollowLogPath = Flag.ON;
             this.flag.isInitMonitorTheme = Flag.ON;
+            this.flag.isNeedInitLog = Flag.ON;
         }
         /**
             *  此方法上传文件
@@ -242,6 +250,7 @@ namespace APPLogic
                 if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
                 {
                     this.setLogic_buff.SetParam.FileSavePath = dlg.FileName; // 选中的文件夹路径
+                    this.flag.isFollowFilePath = Flag.OFF; // 不跟随
                 }
             }, DispatcherPriority.Normal); // 使用 UI 线程
         }
@@ -258,6 +267,7 @@ namespace APPLogic
 
                 if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
                 {
+                    this.flag.isFollowLogPath = Flag.OFF; // 不跟随
                     this.setLogic_buff.SetParam.LogSavePath = dlg.FileName; // 选中的文件夹路径
                 }
             });
@@ -273,6 +283,7 @@ namespace APPLogic
             if (string.IsNullOrWhiteSpace(Filepath)) return "null";  // 确保已经选择了文件
 
             FileAlreadyUpload = false;
+            this.flag.isGenFrontLog = Flag.ON; // 生成首页日志
             FileName = System.IO.Path.GetFileNameWithoutExtension(Filepath);
             byte[] fileData = File.ReadAllBytes(Filepath);
             string cArrayContent = FileToCArray(fileData, FileName);
@@ -285,6 +296,7 @@ namespace APPLogic
                     this.flag.isHistoryFileFull = Flag.ON; // 文件已满
                 }
                 this.flag.isHistoryFileNew = Flag.ON; // 有新的历史文件记录被更新
+                this.flag.isGenHistoryLog = Flag.ON;  // 记录日志
                 mainWindow.Dispatcher.Invoke(() =>
                 {
                     historyFile.Add(new HistoryFile
@@ -307,7 +319,7 @@ namespace APPLogic
                 string directory = System.IO.Path.GetDirectoryName(Filepath);  // 获取文件所在目录
                 string outputFilePath;
 
-                if (this.flag.isFollowFilePath == Flag.ON)
+                if (this.flag.isFollowFilePath == Flag.ON )
                 {
                     outputFilePath = System.IO.Path.Combine(directory, FileName + ".c");  // 在同级目录生成 C 文件  
                 }
@@ -393,7 +405,7 @@ namespace APPLogic
                 this.flag.isStartConvertButt = Flag.OFF;
                 this.flag.isFileAlUpload = Flag.OFF;
 
-                if (this.setLogic.SetParam.AutoGenerateC == true)
+                if (this.setLogic.SetParam.AutoGenerateC == true) // 自动生成c数组
                 {
                     content = this.GenerCArray(true);
                 }
@@ -659,6 +671,7 @@ namespace APPLogic
             if (this.flag.isGlobalSetUpdate == Flag.ON && this.flag.isCancelSet == Flag.OFF) // 如果是全局设置
             {
                 this.flag.isGlobalSetUpdate = Flag.OFF; // 关闭全局设置
+                this.flag.isGenSetLog = Flag.ON; // 生成设置日志
                 setLogic.SetParam = setLogic_buff.SetParam;
                 UpdateSetPage_Page(setLogic.SetParam); // 刷ui 因为缓存不一定是设置，设置也不一定是缓存，所以两个参数刷两次
 
@@ -674,6 +687,8 @@ namespace APPLogic
                 setLogic_buff.SetParam.LogSavePath = "/default";
                 setLogic_buff.SetParam.FileSavePath = "/default";
                 this.setLogic.SetParam = setLogic_buff.SetParam;
+                this.flag.isFollowFilePath = Flag.OFF; // 不跟随
+                this.flag.isFollowLogPath = Flag.OFF; // 不跟随
                 // 刷默认ui
                 UpdateSetPage_Page();
             }
@@ -771,6 +786,55 @@ namespace APPLogic
                 default:
                     param.SetParam.SaveFileHeader = SettingLogic_Class.SaveFileHeader_t.YES;
                     break;
+            }
+        }
+
+        // 处理日志逻辑
+        public void DealWith_Log()
+        {
+            // 日志总开关
+            if (this.setLogic.SetParam.GenerateLog == false) return;
+            // 初始化日志逻辑
+            if(this.flag.isNeedInitLog == Flag.ON)
+            {
+                this.flag.isNeedInitLog = Flag.OFF;
+                if(this.flag.isFollowLogPath == Flag.ON && Filepath != null) // 如果日志跟随路径
+                {
+                    Log = new AppLog_Class(Filepath);
+                } else if(this.flag.isFollowLogPath == Flag.OFF && (this.setLogic.SetParam.LogSavePath != null || this.setLogic.SetParam.LogSavePath != "/default"))
+                {
+                    Log = new AppLog_Class(this.setLogic.SetParam.LogSavePath);
+                }
+            }
+
+            if (Log == null) return;
+            // 生成日志逻辑
+
+            // 生成设置日志
+            if(this.flag.isGenSetLog == Flag.ON)
+            {
+                this.flag.isGenSetLog = Flag.OFF;
+                this.Log.GeneralLog_Set(this.setLogic);
+            }
+
+            // 生成首页日志
+            if(this.flag.isGenFrontLog == Flag.ON)
+            {
+                this.flag.isGenFrontLog = Flag.OFF;
+                this.Log.GeneralLog_Front();
+            }
+
+            // 生成历史记录日志
+            if(this.flag.isGenHistoryLog == Flag.ON)
+            {
+                this.flag.isGenHistoryLog = Flag.OFF;
+                this.Log.GeneralLog_History();
+            }
+
+            if(this.flag.isGenUartLog == Flag.ON)
+            {
+                this.flag.isGenUartLog = Flag.OFF;
+                this.Log.GeneralLog_Uart();
             }
         }
 
