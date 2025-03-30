@@ -2,16 +2,44 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <Platforms>AnyCPU;x64</Platforms>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Platforms>AnyCPU;x64;ARM32</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
     <BaseOutputPath>D:\C#\project\FileConver\bin</BaseOutputPath>
     <SignAssembly>False</SignAssembly>
-    <PackageIcon>favicon.ico</PackageIcon>
+    <PackageIcon>icon.png</PackageIcon>
     <ApplicationIcon>icon\favicon.ico</ApplicationIcon>
+    <UseWindowsForms>False</UseWindowsForms>
+    <StartupObject></StartupObject>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM32'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM32'">
+    <Optimize>False</Optimize>
   </PropertyGroup>
 
   <ItemGroup>

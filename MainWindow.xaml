@@ -107,7 +107,7 @@
 
         <!-- 设置界面 -->
         <!-- 设置界面 -->
-        <Grid Grid.Column="1" Visibility="Visible" x:Name="SettingsPanel_Grid">
+        <Grid Grid.Column="1" Visibility="Collapsed" x:Name="SettingsPanel_Grid">
             <!-- 滚动容器 -->
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
                   HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
@@ -227,7 +227,98 @@
             </ScrollViewer>
         </Grid>
 
-        
+        <Grid x:Name="UARTSend_Grid" Margin="5" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <GroupBox Header="串口下发数据" Margin="5">
+                <Grid Margin="10">
+                    <!-- 定义行和列 -->
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- 选择串口号 -->
+                    <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="5">
+                        <TextBlock Text="端口号：" VerticalAlignment="Center" Margin="5"/>
+                        <ComboBox x:Name="UartSelect_COM" Width="120" Margin="5">
+                            <ComboBoxItem Content="COM1" IsSelected="True"/>
+                            <ComboBoxItem Content="COM2"/>
+                            <ComboBoxItem Content="COM3"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <!-- 选择波特率 -->
+                    <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="5">
+                        <TextBlock Text="波特率：" VerticalAlignment="Center" Margin="5"/>
+                        <ComboBox x:Name="BaudRate_Combo" Width="120" Margin="5">
+                            <ComboBoxItem Content="9600"/>
+                            <ComboBoxItem Content="115200" IsSelected="True"/>
+                            <ComboBoxItem Content="256000"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <!-- 选择发送协议 -->
+                    <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Margin="5">
+                        <TextBlock Text="发送协议:" VerticalAlignment="Center" Margin="5"/>
+                        <ComboBox HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="20" Width="120" Margin="5">
+                            <ComboBoxItem Content="Json" Tag="json"/>
+                            <ComboBoxItem Content="Modbus" Tag="Modbus" IsSelected="True"/>
+                            <ComboBoxItem Content="RawData" Tag="RawData"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <!-- 连续发送和时间间隔 -->
+                    <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Margin="5">
+                        <CheckBox Content="连续发送" Margin="5"/>
+                        <TextBlock Text="时间间隔 :" VerticalAlignment="Center" Margin="200,5,5,5"/>
+                        <TextBox Width="50" Margin="5"/>
+                        <TextBlock Text="秒" VerticalAlignment="Center" Margin="5"/>
+                    </StackPanel>
+
+                    <!-- 选择发送数据来源 -->
+                    <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4" Orientation="Horizontal" Margin="5">
+                        <CheckBox Content="发送用户数据" x:Name="SendUserData_CheckBox" Margin="5"/>
+                        <CheckBox Content="发送所选文件数据" x:Name="SendSelFile_CheckBox" Margin="5"/>
+                    </StackPanel>
+
+                    <!-- 选择历史记录文件 -->
+                    <StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" Margin="5">
+                        <TextBlock Text="选择历史记录文件：" VerticalAlignment="Center" Margin="5"/>
+                        <ComboBox x:Name="HistoryComboBox" Width="250" Margin="5">
+                            <ComboBoxItem Content="文件1.txt"/>
+                            <ComboBoxItem Content="文件2.txt"/>
+                            <ComboBoxItem Content="文件3.txt"/>
+                        </ComboBox>
+                        <Button Content="加载文件" Width="80" Margin="5"/>
+                    </StackPanel>
+
+                    <!-- 发送数据框 -->
+                    <StackPanel Orientation="Horizontal" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="4" Margin="5">
+                        <TextBlock Text="用户数据：" VerticalAlignment="Center" Margin="5"/>
+                        <TextBox x:Name="SendTextBox" Width="300" Height="30" Margin="5"/>
+                    </StackPanel>
+
+                    <!-- 按钮 -->
+                    <StackPanel Orientation="Horizontal" Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="4" HorizontalAlignment="Center" Margin="5">
+                        <Button x:Name="SendButton" Content="发送" Width="80" Height="30" Margin="5" Background="Blue" Foreground="White" Click="SendUart_Click"/>
+                        <Button x:Name="OpenPortButton" Content="打开串口" Width="100" Height="30" Margin="5" Background="Green" Foreground="White" Click="OpenUart_Click"/>
+                        <Button x:Name="ClosePortButton" Content="关闭串口" Width="100" Height="30" Margin="5" Background="Red" Foreground="White" Click="CloseUart_Click"/>
+                    </StackPanel>
+                </Grid>
+            </GroupBox>
+        </Grid>
+
+
 
     </Grid>
 </Window>

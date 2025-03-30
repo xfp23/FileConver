@@ -41,20 +41,20 @@ namespace FileConver
         // while(1)
         private void Taskloop()
         {
-            Debug.WriteLine($"Taskloop 被调用, UserTimer={true}");
+            //Debug.WriteLine($"Taskloop 被调用, UserTimer={true}");
 
             while (isRunning)
             {
                 if (userTimer.UserTimFlag.system1ms_Flag)
                 {
-                    Debug.WriteLine("[线程] 处理 1ms 任务...");
+                    //Debug.WriteLine("[线程] 处理 1ms 任务...");
                     userTimer.UserTimFlag.system1ms_Flag = false;
                     AppDevice.MonitorSystemTheme();
                 }
 
                 if (userTimer.UserTimFlag.system10ms_Flag)
                 {
-                    Debug.WriteLine("[线程] 处理 10ms 任务...");
+                    //F("[线程] 处理 10ms 任务...");
                     userTimer.UserTimFlag.system10ms_Flag = false;
                     // **在 UI 线程上调用 PageManage**
                     if (Application.Current?.Dispatcher != null && !Application.Current.Dispatcher.HasShutdownStarted)
@@ -73,14 +73,14 @@ namespace FileConver
 
                 if (userTimer.UserTimFlag.system100ms_Flag)
                 {
-                    Debug.WriteLine("[线程] 处理 100ms 任务...");
+                    //Debug.WriteLine("[线程] 处理 100ms 任务...");
                     userTimer.UserTimFlag.system100ms_Flag = false;
                     AppDevice.DealWith_History();
                 }
 
                 if (userTimer.UserTimFlag.system500ms_Flag)
                 {
-                    Debug.WriteLine("[线程] 处理 500ms 任务...");
+                    //Debug.WriteLine("[线程] 处理 500ms 任务...");
                     userTimer.UserTimFlag.system500ms_Flag = false;
                    
                     AppDevice.DealWith_SetPage(); // 处理设置页面
@@ -88,7 +88,7 @@ namespace FileConver
 
                 if (userTimer.UserTimFlag.system1000ms_Flag)
                 {
-                    Debug.WriteLine("[线程] 处理 1000ms 任务...");
+                    //Debug.WriteLine("[线程] 处理 1000ms 任务...");
                     userTimer.UserTimFlag.system1000ms_Flag = false;
                     AppDevice.DealWith_Log();
                 }
@@ -114,6 +114,7 @@ namespace FileConver
             FrontePage_Grid.Visibility = (page == PageSelect_t.FRONT_PAGE) ? Visibility.Visible : Visibility.Collapsed;
             HistoryFile_Grid.Visibility = (page == PageSelect_t.HISTORY_PAGE) ? Visibility.Visible : Visibility.Collapsed;
             SettingsPanel_Grid.Visibility = (page == PageSelect_t.SETUP_PAGE) ? Visibility.Visible : Visibility.Collapsed;
+            UARTSend_Grid.Visibility = (page == PageSelect_t.UART_PAGE) ? Visibility.Visible : Visibility.Collapsed;
         }
         // 处理导航栏按钮
         private void FrontePage_butt(object sender, RoutedEventArgs e)
@@ -263,6 +264,26 @@ namespace FileConver
                 AppDevice.setLogic_buff.SaveFileHeader_StringTemp = selectedItem.Tag.ToString();
             }
         }
+
+        // 按下串口发送事件
+        private void SendUart_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+
+        // 打开串口事件
+        private void OpenUart_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        // 关闭串口事件
+        private void CloseUart_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
 
     }
 }
